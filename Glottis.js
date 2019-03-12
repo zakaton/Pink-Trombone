@@ -55,21 +55,11 @@ class Glottis {
 
     static get parameterDescriptors() {
         return [
-            {
-                name : "glottisFrequency",
-                defaultValue : 140,
-            },
-            {
-                name : "glottisIntensity",
-                defaultValue : 0,
-            }
+            // can define custom parameters that will be used by the pinkTromboneWorkletProcessor
         ]
     }
     setParameters(parameters, sampleIndex) {
-        const frequency = (parameters.glottisFrequency.length == 1)?
-            parameters.glottisFrequency[0] :
-            parameters.glottisFrequency[sampleIndex];
-        // do whatever with the frequency here...
+        // will be passed parameters from the parent pinkTromboneWorkletProcessor in its .process method
     }
 
     setupWaveform(lambda) {

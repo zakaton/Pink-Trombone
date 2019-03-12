@@ -39,18 +39,6 @@ class PinkTromboneProcessor extends AudioWorkletProcessor {
 
         this.port.onmessage = event => {
             switch(event.data.type) {
-                case "setVoice":
-                    this.alwaysVoice = event.data.value;
-                    break;
-                case "getVoice":
-                    this.port.postMessage({type: "getVoice", value: this.alwaysVoice});
-                    break;
-                case "setWobble":
-                    this.alwaysWobble = event.data.wobble;
-                    break;
-                case "getWobble":
-                    this.port.postMessage({type: "getWobble", value: this.alwaysWobble});
-                    break;
                 default:
                     break;
             }
@@ -61,6 +49,14 @@ class PinkTromboneProcessor extends AudioWorkletProcessor {
         return [
             {
                 name : "turbulenceNoise"
+            },
+            {
+                name : "alwaysVoice",
+                defaultValue : 1,
+            },
+            {
+                name : "alwaysWobble",
+                defaultValue : 1,
             },
         ].concat(...Glottis.parameterDescriptors, ...Tract.parameterDescriptors);
     }
@@ -98,6 +94,15 @@ class PinkTromboneProcessor extends AudioWorkletProcessor {
     }
 
     setParameters(parameters, sampleIndex) {
+        ["alwaysVoice", "alwaysWobble"].forEach(parameterName => {
+            const parameter = parameters[parameterName];
+            const sample = parameter.length === 1?
+                parameter[0] :
+                parameter[sampleIndex];
+
+            this[parameterName] = (sample >= 1);
+        })
+
         this.glottis.setParameters(parameters, sampleIndex);
         this.tract.setParameters(parameters, sampleIndex);
     }
@@ -110,9 +115,9 @@ class PinkTromboneProcessor extends AudioWorkletProcessor {
 
         var outputSample = 0;
 
-        this.tract.runStep(glottisSample, turbulenceNoiseSample, lambda1);
+        this.tract.runStep(glottisSample, turbulenceNoiseSample, lambda1, this.glottis.noiseModulator);
             outputSample += this.tract.output.lip + this.tract.output.nose;
-        this.tract.runStep(glottisSample, turbulenceNoiseSample, lambda2);
+        this.tract.runStep(glottisSample, turbulenceNoiseSample, lambda2, this.glottis.noiseModulator);
             outputSample += this.tract.output.lip + this.tract.output.nose;
         
         return outputSample * 0.125;

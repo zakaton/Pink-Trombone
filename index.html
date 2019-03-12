@@ -1,8 +1,48 @@
 <html>
     <head>
-        <script src="script.js" type="module"></script>
+        <title>Pink Trombone</title>
     </head>
+
     <body>
-        <h1>Pink Trombone</h1>
+        <canvas id=tractCanvas></canvas>
+        <canvas id=backCanvas></canvas>
     </body>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: white;
+        }
+        canvas {
+            width: 600;
+            height: 600;
+            position: absolute;
+            background-color: transparent;
+            margin: 0;
+            padding: 0;
+        }
+        #tractCanvas {
+            z-index: 1;
+        }
+        #backCanvas {
+            z-index: 0;
+        }
+    </style>
+
+    <script type="module">
+        import PinkTrombone from "/PinkTrombone.js";
+
+        const audioContext = new AudioContext();
+
+        PinkTrombone.Load(audioContext)
+            .then(() => {
+                const pinkTrombone = new PinkTrombone(audioContext);
+                    pinkTrombone.connect(audioContext.destination);
+                    pinkTrombone.start();
+
+                    window.pinkTrombone = pinkTrombone;
+                    window.audioContext = audioContext;
+            })
+    </script>
 </html>

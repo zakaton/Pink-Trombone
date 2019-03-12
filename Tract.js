@@ -1,3 +1,5 @@
+import Transient from "/Transient.js";
+
 class Tract {
     constructor() {
         this.length = 44;
@@ -147,16 +149,15 @@ class Tract {
         }
     }
 
-    runStep(glottalOutput, turbulenceNoise, lambda) {
+    runStep(glottalOutput, turbulenceNoise, lambda, noiseModulator) {
         const updateAmplitudes = (Math.random() < 0.1);
 
         this.processTransients();
-        this.addTurbulenceNoise(turbulenceNoise);
+        this.addTurbulenceNoise(turbulenceNoise, noiseModulator);
 
         this.junctionOutput.right[0] = this.left[0] * this.reflection.glottal + glottalOutput;
         this.junctionOutput.left[this.length] = this.right[this.length-1] * this.reflection.lip;
 
-        // A()
         for(let index = 1; index < this.length; index++) {
             const r = Math.interpolate(lambda, this.reflection[index], this.reflection.new[index]);
             const w = r * (this.right[index-1] + this.left[index]);
@@ -176,7 +177,7 @@ class Tract {
         const noseInterpolation = Math.interpolate(lambda, this.reflection.new.nose, this.reflection.nose);
         this.nose.junctionOutput.right[0] = noseInterpolation * this.nose.left[0] + (noseInterpolation+1) * (this.left[index] + this.right[index-1]);
 
-        // B()
+
         for(let index = 0; index < this.length; index++) {
             this.right[index] = this.junctionOutput.right[index] * 0.999;
             this.left[index] = this.junctionOutput.left[index+1] * 0.999;
@@ -193,7 +194,6 @@ class Tract {
 
         this.nose.junctionOutput.left[this.nose.length] = this.nose.right[this.nose.length-1] * this.reflection.lip;
 
-        // A(nose)
         for(let index = 1; index < this.nose.length; index++) {
             const w = this.nose.reflection[index] * (this.nose.right[index-1] + this.nose.left[index]);
 
@@ -201,7 +201,6 @@ class Tract {
             this.nose.junctionOutput.left[index] = this.nose.left[index] + w;
         }
 
-        // B(nose)
         for(let index = 0; index < this.nose.length; index++) {
             this.nose.right[index] = this.nose.junctionOutput.right[index] * this.fade;
             this.nose.left[index] = this.nose.junctionOutput.left[index+1] * this.fade;
@@ -218,14 +217,14 @@ class Tract {
     processTransients() {
         for(let index = 0; index < this.transients.length; index++) {
             const transient = this.transients[index];
-            const amplitude = transient.strength * Math.pow(2, -transient.exponent * transient.timeAlive);
+            const amplitude = transient.amplitude;
             this.right[transient.position] += amplitude/2;
-            this.left[TransitionEvent.position] += amplitude/2;
+            this.left[transient.position] += amplitude/2;
             transient.timeAlive += 1.0/(sampleRate*2);
         }
         for(let index = this.transients.length-1; index >= 0; index--) {
             const transient = this.transients[index];
-            if(transient.timeAlive > transient.lifeTime)
+            if(!transient.isAlive)
                 this.transients.splice(index, 1);
         }
     }
@@ -258,8 +257,10 @@ class Tract {
             this.diameter[index] = Math.moveTowards(diameter, targetDiameter, slowReturn*amount, 2*amount);
         }
 
-        if((this.lastObstruction > -1) && (newLastObstruction == -1) && (this.nose.A[0] < 0.05))
-            this.addTransient(this.lastObstruction);
+        if((this.lastObstruction > -1) && (newLastObstruction == -1) && (this.nose.A[0] < 0.05)) {
+            const transient = new Transient(this.lastObstruction);
+            this.transients.push(transient);
+        }
         
         this.lastObstruction = newLastObstruction;
 
@@ -270,22 +271,11 @@ class Tract {
         this.nose.A[0] = Math.pow(this.nose.diameter[0], 2);
     }
 
-    addTransient(position) {
-        const transient = {
-            position : position,
-            timeAlive : 0,
-            lifeTime : 0.2,
-            strength : 0.3,
-            exponent : 200,
-        }
-        this.transients.push(transient);
+    addTurbulenceNoise(turbulenceNoise, noiseModulator) {
+        // fill
     }
 
-    addTurbulenceNoise(turbulenceNoise) {
-        // FILL?
-    }
-    // how to grant access to noiseModulator?
-    addTurbulenceNoiseAtIndex(turbulenceNoise, index, diameter, noiseModulator = 0) {
+    addTurbulenceNoiseAtIndex(turbulenceNoise, index, diameter, noiseModulator) {
         const indexComplements = [
             index % 1,
             1 - (index % 1),

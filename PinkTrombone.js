@@ -43,8 +43,6 @@ class PinkTrombone {
         return Promise.all([WhiteNoise.Load(audioContext), this._Load(audioContext)])
     }
 
-    // audioParam getters
-
     connect(destinationNode, outputIndex, inputIndex) {
         return this.workletNode.connect(...arguments);
     }
