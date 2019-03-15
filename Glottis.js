@@ -157,4 +157,4 @@ class Glottis {
     }
 }
 
-export default Glottis
+export default Glottis;

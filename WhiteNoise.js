@@ -4,6 +4,7 @@ class WhiteNoise extends AudioWorkletNode {
             throw "Not Loaded!";
 
         super(audioContext, "white-noise-processor");
+        this.started = false;
     }
 
     static Load(audioContext) {
@@ -16,11 +17,13 @@ class WhiteNoise extends AudioWorkletNode {
         this.port.postMessage({
             type : "start",
         })
+        this.started = true;
     }
     stop() {
         this.port.postMessage({
             type : "stop",
         })
+        this.started = false;
     }
 }
 

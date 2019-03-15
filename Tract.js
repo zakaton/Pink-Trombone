@@ -1,4 +1,5 @@
 import Transient from "/Transient.js";
+import Math from "/MathExtension.js";
 
 class Tract {
     constructor() {

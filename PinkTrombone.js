@@ -5,6 +5,8 @@ class PinkTrombone {
         if(!PinkTrombone.isLoaded)
             throw "Load PinkTrombone First!";
 
+        this.audioContext = audioContext;
+
         this.whiteNoise = new WhiteNoise(audioContext);
         this.workletNode = new PinkTrombone.WorkletNode(audioContext);
 
@@ -21,26 +23,43 @@ class PinkTrombone {
         [this.aspirateFilter, this.fricativeFilter].forEach(filter => {
             this.whiteNoise.connect(filter).connect(this.workletNode.turbulenceNoise);
         })
+
         this.whiteNoise.connect(this.workletNode.turbulenceNoise);
     }
 
     static _Load(audioContext) {
         return audioContext.audioWorklet.addModule("pinkTromboneProcessor.js").then(() => {
-            this.WorkletNode = class PinkTromboneWorkletNode extends AudioWorkletNode {
-                constructor(audioContext) {
-                    super(audioContext, "pink-trombone-processor");
-                    this.parameters.forEach((audioParam, paramName) => {
-                        this[paramName] = audioParam;
-                    })
-                }
-                
-            }
             this.isLoaded = true;
         })
     }
 
     static Load(audioContext) {
         return Promise.all([WhiteNoise.Load(audioContext), this._Load(audioContext)])
+    }
+
+    static get WorkletNode() {
+        return class extends AudioWorkletNode {
+            constructor(audioContext) {
+                super(audioContext, "pink-trombone-processor");
+                this.parameters.forEach((audioParam, paramName) => {
+                    this[paramName] = audioParam;
+                })
+            }
+        }
+    }
+
+    get alwaysVoice() {
+        return this.workletNode.alwaysVoice.value >= 1;
+    }
+    set alwaysVoice(newValue) {
+        this.workletNode.alwaysVoice.value = newValue? 1:0;
+    }
+
+    get alwaysWobble() {
+        return this.workletNode.alwaysVoice.value >= 1;
+    }
+    set alwaysWobble(newValue) {
+        this.workletNode.alwaysWobble.value = newValue? 1:0;
     }
 
     connect(destinationNode, outputIndex, inputIndex) {
@@ -56,6 +75,10 @@ class PinkTrombone {
     stop() {
         this.whiteNoise.stop();
     }
+
+    get started() {
+        return this.whiteNoise.started;   
+    }
 }
 
-export default PinkTrombone
+export default PinkTrombone;

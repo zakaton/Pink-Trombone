@@ -1,48 +1,37 @@
 <html>
     <head>
         <title>Pink Trombone</title>
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="mobile-web-app-capable" content="yes">
     </head>
 
-    <body>
-        <canvas id=tractCanvas></canvas>
-        <canvas id=backCanvas></canvas>
-    </body>
+    <body></body>
 
     <style>
         body {
             margin: 0;
             padding: 0;
             background-color: white;
-        }
-        canvas {
-            width: 600;
-            height: 600;
-            position: absolute;
-            background-color: transparent;
-            margin: 0;
-            padding: 0;
-        }
-        #tractCanvas {
-            z-index: 1;
-        }
-        #backCanvas {
-            z-index: 0;
+
+            cursor: pointer;
         }
     </style>
 
     <script type="module">
         import PinkTrombone from "/PinkTrombone.js";
+        import PinkTromboneUI from "/PinkTromboneUI.js";
 
         const audioContext = new AudioContext();
 
         PinkTrombone.Load(audioContext)
             .then(() => {
                 const pinkTrombone = new PinkTrombone(audioContext);
-                    pinkTrombone.connect(audioContext.destination);
-                    pinkTrombone.start();
+                const pinkTromboneUI = new PinkTromboneUI(pinkTrombone);
+                
+                pinkTromboneUI.render();
+                window.pinkTrombone = pinkTrombone;
 
-                    window.pinkTrombone = pinkTrombone;
-                    window.audioContext = audioContext;
+                window.pinkTromboneUI = pinkTromboneUI
             })
     </script>
 </html>
