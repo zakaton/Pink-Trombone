@@ -1,8 +1,0 @@
-PinkTrombone getter/setter stream
-    What UI stuff can be offloaded onto the Processing and VV?
-
-Touch Class has weird coupling (diameter and index require UI and TractUI)
-
-PinkTrombone inside PinkTromboneUI
-
-drawing is annoying (draw everything and cover up)
