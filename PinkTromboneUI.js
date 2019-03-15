@@ -15,6 +15,7 @@ class PinkTromboneUI {
             top : 5,
             left : 5,
         };
+
         this.inAboutScreen = true;
         this.inInstructionsScreen = false;
         this.instructionsLine = 0;
@@ -45,7 +46,7 @@ class PinkTromboneUI {
 
         this.mouse = {
             touches : [],
-            touch : {alive: false, endTime: 0}, // replace with new Touch() later
+            touch : {alive: false, endTime: 0},
             down : false,
         };
 
@@ -75,6 +76,13 @@ class PinkTromboneUI {
         });
 
         document.addEventListener("mousemove", (event) => this.moveMouse(event));
+
+        this.pinkTrombone.workletNode.port.onmessage = event => {
+            switch(event.data.type) {
+                default:
+                    break;
+            }
+        }
     }
 
     get time() {
@@ -120,14 +128,14 @@ class PinkTromboneUI {
     }
 
     drawInstructionsScreen() {
-        if(window.pinkTrombone)
-            this.stop();
+        this.stop();
                 
         const context = this.tractContext;
             context.globalAlpha = 0.85;
             context.fillStyle = "white";
             context.rect(0,0,600,600);
             context.fill();
+            
             context.globalAlpha = 1.0;
             context.fillStyle = "#C070C6";
             context.strokeStyle = "#C070C6";
@@ -154,15 +162,19 @@ class PinkTromboneUI {
             this.write("");
             this.write("");
             this.write("(tap anywhere to continue)");
+            
             context.textAlign = "center";
             context.fillText("[tap here to RESET]", 470, 535);
+            
             this.instructionsLine = 18.8;
             context.textAlign = "left";
             this.write("Pink Trombone v1.1");
             this.write("by Neil Thapen");
+            
             context.fillStyle = "blue";
             context.globalAlpha = 0.6;
             this.write("venuspatrol.nfshost.com");
+            
             context.globalAlpha = 1.0;
     }
 
@@ -211,7 +223,6 @@ class PinkTromboneUI {
             }
 
             if(this.inInstructionsScreen) {
-                // possible issue?
                 event.changedTouches.forEach(touch => {
                     const x = (touch.pageX - this.margin.left) / this.width * 600;
                     const y = (touch.pageY - this.margin.top) / this.width * 600;
@@ -274,7 +285,7 @@ class PinkTromboneUI {
     }
 
     startMouse(event) {
-        if(window.pinkTrombone && !window.pinkTrombone.started) {
+        if(!this.pinkTrombone.started) {
             this.start();
         }
 

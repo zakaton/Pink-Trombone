@@ -30,6 +30,10 @@ class GlottisUI {
         return Date.now()/1000;
     }
 
+    update(event) {
+        
+    }
+
     drawKeyboard() {
         this.backContext.strokeStyle = this.backContext.fillStyle = GlottisUI.palePink;
         this.backContext.globalAlpha = 1.0;

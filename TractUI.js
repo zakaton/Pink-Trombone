@@ -70,6 +70,10 @@ class TractUI {
         return Date.now()/1000;
     }
 
+    update(event) {
+        
+    }
+
     moveTo(i, d) { // time
         // var angle = this.angle.offset + i * this.angle.scale * Math.PI / (Tract.start.lip - 1);
         // var wobble = (Tract.amplitude.max[Tract.length - 1] + Tract.nose.amplitude.max[Tract.nose.length - 1]);

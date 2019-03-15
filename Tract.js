@@ -294,6 +294,10 @@ class Tract {
             this[direction][index+2] += noise[1]/2;
         });
     }
+
+    handleTouches(event) {
+
+    }
 }
 
 export default Tract

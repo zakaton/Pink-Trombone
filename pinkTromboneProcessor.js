@@ -1,6 +1,8 @@
 import Glottis from "/Glottis.js";
 import Tract from "/Tract.js";
 
+import Object from "/ObjectExtension.js";
+
 class PinkTromboneProcessor extends AudioWorkletProcessor {
     constructor() {
         super();
@@ -10,9 +12,49 @@ class PinkTromboneProcessor extends AudioWorkletProcessor {
 
         this.alwaysVoice = true;
         this.alwaysWobble = true;
-
+        
         this.port.onmessage = event => {
             switch(event.data.type) {
+                case "get":
+                case "set":
+                    var object;
+                    switch(event.data.subtype) {
+                        case "glottis":
+                            object = this.glottis;
+                            break;
+                        case "tract":
+                            object = this.tract;
+                            break;
+                        default:
+                            object = this;
+                            break;
+                    }
+
+                    const path = [event.data.key] || event.data.path;
+                    var value;
+
+                    if(event.data.type == "set") {
+                        const newValue = event.data.value;
+                        value = Object.set(newValue, object, ...path);
+                    }
+                    else {
+                        value = Object.get(object, ...path);
+                    }
+
+                    this.port.postMessage({
+                        type : event.data.type,
+                        subtype : event.data.subtype,
+                        value : value,
+                    });
+
+                    break;
+                case "handleTouches":
+                    this.glottis.handleTouches(event);
+                    this.tract.handleTouches(event);
+                    break;
+                case "update":
+                    // send back state or something
+                    break;
                 default:
                     break;
             }

@@ -25,6 +25,17 @@ class PinkTrombone {
         })
 
         this.whiteNoise.connect(this.workletNode.turbulenceNoise);
+
+        this.workletNode.port.onmessage = event => {
+            switch(event.data.type) {
+                case "get":
+                    break;
+                case "set":
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     static _Load(audioContext) {

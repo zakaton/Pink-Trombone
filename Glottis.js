@@ -155,6 +155,9 @@ class Glottis {
         
         this.intensity = Math.clamp(this.intensity + intensityOffset, 0, 1);
     }
+    handleTouches(event) {
+        
+    }
 }
 
 export default Glottis;
