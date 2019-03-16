@@ -3,9 +3,12 @@ import WhiteNoise from "/WhiteNoise.js";
 class PinkTrombone {
     constructor(audioContext) {
         if(!PinkTrombone.isLoaded)
-            throw "Load PinkTrombone First!";
+            throw "Load PinkTrombone First!"; // can use a ScriptProcessor Alternative
 
         this.audioContext = audioContext;
+
+        this.glottis = {};
+        this.tract = {};
 
         this.whiteNoise = new WhiteNoise(audioContext);
         this.workletNode = new PinkTrombone.WorkletNode(audioContext);
@@ -26,16 +29,26 @@ class PinkTrombone {
 
         this.whiteNoise.connect(this.workletNode.turbulenceNoise);
 
-        this.workletNode.port.onmessage = event => {
+        this.workletNode.port.addEventListener("message", event => {
             switch(event.data.type) {
                 case "get":
+                    switch(event.data.key) {
+                        case "glottis":
+                            this.glottis = event.data.value;
+                            break;
+                        case "tract":
+                            this.tract = event.data.value;
+                            break;
+                        default:
+                            break;
+                    }
                     break;
                 case "set":
                     break;
                 default:
                     break;
             }
-        }
+        })
     }
 
     static _Load(audioContext) {
@@ -89,6 +102,17 @@ class PinkTrombone {
 
     get started() {
         return this.whiteNoise.started;   
+    }
+
+    update() {
+        this.workletNode.port.postMessage({
+            type : "get",
+            key : "glottis",
+        });
+        this.workletNode.port.postMessage({
+            type : "get",
+            key : "tract",
+        })
     }
 }
 

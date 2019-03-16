@@ -76,13 +76,6 @@ class PinkTromboneUI {
         });
 
         document.addEventListener("mousemove", (event) => this.moveMouse(event));
-
-        this.pinkTrombone.workletNode.port.onmessage = event => {
-            switch(event.data.type) {
-                default:
-                    break;
-            }
-        }
     }
 
     get time() {
@@ -392,6 +385,7 @@ class PinkTromboneUI {
         this.draw();
         window.requestAnimationFrame(TS => this.redraw(TS));
         this.updateTouches();
+        this.pinkTrombone.update();
     }
 
     start() {

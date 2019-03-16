@@ -4,6 +4,9 @@ class Glottis {
     constructor() {
         this.noise = new SimplexNoise();
 
+        this.x = 0;
+        this.y = 0;
+
         this.time = {
             inWaveform : 0,
             total : 0,
@@ -154,9 +157,6 @@ class Glottis {
             -0.05;
         
         this.intensity = Math.clamp(this.intensity + intensityOffset, 0, 1);
-    }
-    handleTouches(event) {
-        
     }
 }
 

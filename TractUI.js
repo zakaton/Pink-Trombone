@@ -1,18 +1,23 @@
 class TractUI {
     constructor(pinkTrombone, tractCanvas, backCanvas) {
         this.pinkTrombone = pinkTrombone;
+            this.tract = {};
+            this.glottis = {};
+
         this.tractCanvas = tractCanvas;
             this.tractContext = tractCanvas.getContext("2d");
         this.backCanvas = backCanvas;
             this.backContext = backCanvas.getContext("2d");
 
-        this.originX = 340;
-        this.originY = 449;
+        this.origin = {
+            x : 340,
+            y : 449,
+        };
 
         this.temp = {
             a : 0,
             b : 0,
-        }
+        };
 
         this.radius = 298;
         this.scale = 60;
@@ -71,7 +76,7 @@ class TractUI {
     }
 
     update(event) {
-        
+        // store everything in a this.tract object or something...
     }
 
     moveTo(i, d) { // time
@@ -101,7 +106,7 @@ class TractUI {
         // const r = this.radius - this.scale * d;
         
         // this.tractContext.save();
-        // this.tractContext.translate(this.originX.x - r * Math.cos(angle), this.originX.y - r * Math.sin(angle) + 2);
+        // this.tractContext.translate(this.origin.x - r * Math.cos(angle), this.origin.y - r * Math.sin(angle) + 2);
         // this.tractContext.rotate(angle - Math.PI/2);
         // this.tractContext.fillText(text, 0, 0);
         // this.tractContext.restore();

@@ -27,6 +27,9 @@
                 const pinkTromboneUI = new PinkTromboneUI(pinkTrombone);
                 
                 pinkTromboneUI.render();
+
+                // for some reason you have to define an initial callback to addEventListener
+                pinkTromboneUI.pinkTrombone.workletNode.port.onmessage = () => {}
                 
                 window.pinkTrombone = pinkTrombone;
                 window.pinkTromboneUI = pinkTromboneUI

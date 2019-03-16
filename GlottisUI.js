@@ -1,3 +1,4 @@
+import Object from "/ObjectExtension.js";
 import Touch from "/Touch.js";
 
 class GlottisUI {
@@ -149,19 +150,36 @@ class GlottisUI {
             
             const semitone = this.semitones * x / this.keyboard.width + 0.5;
 
-            // Glottis.frequency.UI = this.baseNote * Math.pow(2, semitone/12);
-            // if(Glottis.intensity == 0)
-                // Glottis.frequency.smooth = Glottis.frequency.UI;
+            this.pinkTrombone.glottis.frequency.UI = this.pinkTrombone.glottis.baseNote * Math.pow(2, semitone/12);
+            if(this.pinkTrombone.glottis.intensity == 0)
+                this.pinkTrombone.glottis.frequency.smooth = this.pinkTrombone.glottis.frequency.UI;
+            
             const t = Math.clamp(1 - y / (this.keyboard.height - 28), 0, 1);
 
-            // Glottis.tenseness.UI = 1 - Math.cos(t * Math.PI * 0.5);
-            // Glottis.loudness = Math.pow(Glottis.tenseness.UI, 0.25);
-            
-            this.x = this.touch.x;
-            this.y = y + this.keyboard.top + 10;
+            this.pinkTrombone.glottis.tenseness.UI = 1 - Math.cos(t * Math.PI * 0.5);
+            this.pinkTrombone.glottis.loudness = Math.pow(this.pinkTrombone.glottis.tenseness.UI, 0.25);
+
+            this.pinkTrombone.glottis.x = this.touch.x;
+            this.pinkTrombone.glottis.y = y + this.keyboard.top + 10;
         }
 
-        // Glottis.isTouched = (this.touch != 0);
+        this.pinkTrombone.glottis.isTouched = (this.touch != 0);
+
+        [
+            ["frequency", "UI"],
+            ["frequency", "smooth"],
+            ["tenseness", "UI"],
+            ["loudness"],
+            ["x"],
+            ["y"],
+            ["isTouched"],
+        ].forEach(messagePath => {
+            this.pinkTrombone.workletNode.port.postMessage({
+                type : "set",
+                path : ["glottis", ...messagePath],
+                value : Object.get(this.pinkTrombone.glottis, ...messagePath),
+            });
+        });
     }
 }
 

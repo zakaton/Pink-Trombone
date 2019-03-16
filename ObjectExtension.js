@@ -3,7 +3,7 @@ Object.defineProperties(Object, {
         value : function(object, ...path) {
             var subObject = object;
             const isFound = path.every(key => {
-                if(subObject[key]) {
+                if(subObject[key] !== undefined) {
                     subObject = subObject[key];
                     return true;
                 }
