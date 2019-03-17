@@ -16,14 +16,14 @@ class PinkTromboneProcessor extends AudioWorkletProcessor {
         this.port.onmessage = event => {
             switch(event.data.type) {
                 case "get":
-                case "set":                         
+                case "set":               
                     const path = event.data.path || [event.data.key];
-                    
+
                     const value = (event.data.type == "get")?
                         Object.get(this, ...path) :
-                        Object.set(event.data.value, this, ...path)
+                        Object.set(JSON.parse(event.data.value), this, ...path)
 
-                    const message = Object.assign(event.data, {value : value});
+                    const message = Object.assign(event.data, {value : JSON.stringify(value)});
                     this.port.postMessage(message);
                     break;
                 default:

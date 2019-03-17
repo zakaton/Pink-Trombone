@@ -31,10 +31,6 @@ class GlottisUI {
         return Date.now()/1000;
     }
 
-    update(event) {
-        
-    }
-
     drawKeyboard() {
         this.backContext.strokeStyle = this.backContext.fillStyle = GlottisUI.palePink;
         this.backContext.globalAlpha = 1.0;
@@ -174,10 +170,11 @@ class GlottisUI {
             ["y"],
             ["isTouched"],
         ].forEach(messagePath => {
+            const newValue = Object.get(this.pinkTrombone.glottis, ...messagePath);
             this.pinkTrombone.workletNode.port.postMessage({
                 type : "set",
                 path : ["glottis", ...messagePath],
-                value : Object.get(this.pinkTrombone.glottis, ...messagePath),
+                value : JSON.stringify(newValue),
             });
         });
     }

@@ -1,3 +1,6 @@
+import Glottis from "/Glottis.js";
+import Tract from "/Tract.js";
+
 import WhiteNoise from "/WhiteNoise.js";
 
 class PinkTrombone {
@@ -7,8 +10,8 @@ class PinkTrombone {
 
         this.audioContext = audioContext;
 
-        this.glottis = {};
-        this.tract = {};
+        this.glottis = new Glottis();
+        this.tract = new Tract();
 
         this.whiteNoise = new WhiteNoise(audioContext);
         this.workletNode = new PinkTrombone.WorkletNode(audioContext);
@@ -32,12 +35,13 @@ class PinkTrombone {
         this.workletNode.port.addEventListener("message", event => {
             switch(event.data.type) {
                 case "get":
+                    const value = JSON.parse(event.data.value);
                     switch(event.data.key) {
                         case "glottis":
-                            this.glottis = event.data.value;
+                            this.glottis = value;
                             break;
                         case "tract":
-                            this.tract = event.data.value;
+                            this.tract = value;
                             break;
                         default:
                             break;
@@ -48,7 +52,8 @@ class PinkTrombone {
                 default:
                     break;
             }
-        })
+        });
+        this.update();
     }
 
     static _Load(audioContext) {
