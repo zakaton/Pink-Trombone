@@ -94,10 +94,11 @@ class PinkTromboneUI {
     }
 
     drawAboutScreen() {
-        this.tractContext.globalAlpha = 0.8;
-        this.tractContext.fillStyle = "white";
-        this.tractContext.rect(0, 0, 600, 600);
-        this.tractContext.fill();
+        const context = this.tractContext
+        context.globalAlpha = 0.8;
+        context.fillStyle = "white";
+        context.rect(0, 0, 600, 600);
+        context.fill();
 
         this.drawAboutText();
     }
@@ -242,7 +243,7 @@ class PinkTromboneUI {
                 this.buttonsHandleTouchStart(touch);
             });
 
-            this.handleTouches();
+            this.handleTouches(event);
         }
     }
 
@@ -262,7 +263,7 @@ class PinkTromboneUI {
             }
         });
 
-        this.handleTouches();
+        this.handleTouches(event);
     }
 
     endTouches(event) {
@@ -274,7 +275,7 @@ class PinkTromboneUI {
             }
         });
 
-        this.handleTouches();
+        this.handleTouches(event);
     }
 
     startMouse(event) {
@@ -314,7 +315,7 @@ class PinkTromboneUI {
         this.mouse.touches.push(touch);
 
         this.buttonsHandleTouchStart(touch);
-        this.handleTouches();
+        this.handleTouches(event);
     }
 
     moveMouse(event) {
@@ -326,7 +327,7 @@ class PinkTromboneUI {
             touch.index = this.tractUI.getIndex(touch.x, touch.y);
             touch.diameter = this.tractUI.getDiameter(touch.x, touch.y);
 
-            this.handleTouches();
+            this.handleTouches(event);
         }
     }
 
@@ -336,7 +337,7 @@ class PinkTromboneUI {
             touch.alive = false;
             touch.endTime = this.time;
             
-            this.handleTouches();
+            this.handleTouches(event);
 
             if(!this.aboutButton.switchedOn)
                 this.inInstructionsScreen = true;
@@ -346,6 +347,10 @@ class PinkTromboneUI {
     handleTouches(event) {
         this.tractUI.handleTouches(this.mouse.touches);
         this.glottisUI.handleTouches(this.mouse.touches);
+        this.pinkTrombone.workletNode.port.postMessage({
+            type : "touchEvent",
+            value : this.mouse.touches,
+        })
     }
 
     updateTouches() {

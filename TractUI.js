@@ -11,6 +11,8 @@ class TractUI {
             this.tractContext = tractCanvas.getContext("2d");
         this.backCanvas = backCanvas;
             this.backContext = backCanvas.getContext("2d");
+        
+        this.context = this.tractContext;
 
         this.origin = {
             x : 340,
@@ -33,8 +35,8 @@ class TractUI {
                 outer : 3.5,
             },
             indexBound : {
-                lower : this.pinkTrombone.tract.start.blade + 2,
-                upper : this.pinkTrombone.tract.start.tip - 3
+                lower : 0,
+                upper : 0,
             },
             indexCenter : 0,
             touch : 0,
@@ -84,7 +86,7 @@ class TractUI {
         
         const r = this.radius - this.scale*d + 100*wobble;
         
-        this.tractContext.moveTo(this.origin.x - r * Math.cos(angle), this.origin.y - r * Math.sin(angle));
+        this.context.moveTo(this.origin.x - r * Math.cos(angle), this.origin.y - r * Math.sin(angle));
     }
 
     lineTo(i, d) {
@@ -95,37 +97,37 @@ class TractUI {
         
         const r = this.radius - this.scale*d + 100*wobble;
         
-        this.tractContext.lineTo(this.origin.x - r * Math.cos(angle), this.origin.y - r * Math.sin(angle));
+        this.context.lineTo(this.origin.x - r * Math.cos(angle), this.origin.y - r * Math.sin(angle));
     }
 
     drawText(i, d, text) {
         const angle = this.angle.offset + i * this.angle.scale * Math.PI / (this.pinkTrombone.tract.start.lip - 1);
         const r = this.radius - this.scale * d;
         
-        this.tractContext.save();
-        this.tractContext.translate(this.origin.x - r * Math.cos(angle), this.origin.y - r * Math.sin(angle) + 2);
-        this.tractContext.rotate(angle - Math.PI/2);
-        this.tractContext.fillText(text, 0, 0);
-        this.tractContext.restore();
+        this.context.save();
+        this.context.translate(this.origin.x - r * Math.cos(angle), this.origin.y - r * Math.sin(angle) + 2);
+        this.context.rotate(angle - Math.PI/2);
+        this.context.fillText(text, 0, 0);
+        this.context.restore();
     }
 
     drawTextStraight(i, d, text) {
         const angle = this.angle.offset + i * this.angle.scale * Math.PI / (this.pinkTrombone.tract.start.lip - 1);
         const r = this.radius - this.scale * d;
         
-        this.tractContext.save();
-        this.tractContext.translate(this.origin.x - r * Math.cos(angle), this.origin.y - r * Math.sin(angle) + 2);
-        this.tractContext.fillText(text, 0, 0);
-        this.tractContext.restore();
+        this.context.save();
+        this.context.translate(this.origin.x - r * Math.cos(angle), this.origin.y - r * Math.sin(angle) + 2);
+        this.context.fillText(text, 0, 0);
+        this.context.restore();
     }
 
     drawCircle(i, d, radius) {
         const angle = this.angle.offset + i * this.angle.scale * Math.PI / (this.pinkTrombone.tract.start.lip - 1);
         const r = this.radius - this.scale * d;
 
-        this.tractContext.beginPath();
-        this.tractContext.arc(this.origin.x - r * Math.cos(angle), this.origin.y - r * Math.sin(angle), radius, 0, 2*Math.PI);
-        this.tractContext.fill();
+        this.context.beginPath();
+        this.context.arc(this.origin.x - r * Math.cos(angle), this.origin.y - r * Math.sin(angle), radius, 0, 2*Math.PI);
+        this.context.fill();
     }
 
     getIndex(x, y) {
@@ -144,8 +146,9 @@ class TractUI {
     }
 
     draw() {
-        this.tractContext.clearRect(0, 0, this.tractCanvas.width, this.tractCanvas.height);
-        this.tractContext.lineCap = this.tractContext.lineJoin = "round";
+        this.context.clearRect(0, 0, this.tractCanvas.width, this.tractCanvas.height);
+        this.context.lineCap = "round";
+        this.context.lineJoin = "round";
 
         this.drawTongueControl();
         this.drawPitchControl();
@@ -153,135 +156,145 @@ class TractUI {
         const velum = this.pinkTrombone.tract.nose.diameter[0];
         const velumAngle = velum * 4;
 
-        this.tractContext.beginPath();
-        this.tractContext.lineWidth = 2;
-        this.tractContext.strokeStyle = this.tractContext.fillStyle = this.color.fill;
-        this.tractContext.moveTo(1, 0);
+        this.context.beginPath();
+        this.context.lineWidth = 2;
+        this.context.strokeStyle = this.color.fill;
+        this.context.fillStyle = this.color.fill;
+        this.moveTo(1, 0);
+
         for(let index = 1; index < this.pinkTrombone.tract.length; index++)
-            this.tractContext.lineTo(index, this.pinkTrombone.tract.diameter[index]);
+            this.lineTo(index, this.pinkTrombone.tract.diameter[index]);
+        
         for(let index = this.pinkTrombone.tract.length-1; index >= 2; index--)
-            this.tractContext.lineTo(index, 0);
-        this.tractContext.closePath();
-        this.tractContext.stroke();
-        this.tractContext.fill();
+            this.lineTo(index, 0);
+        
+        this.context.closePath();
+        this.context.stroke();
+        this.context.fill();
 
-        this.tractContext.beginPath();
-        this.tractContext.lineWidth = 2;
-        this.tractContext.strokeStyle = this.tractContext.fillStyle = this.color.fill;
-        this.moveTo(this.pinkTrombone.tract.start.nose, -this.offset.nose);
+        this.context.beginPath();
+        this.context.lineWidth = 2;
+        this.context.strokeStyle = this.color.fill
+        this.context.fillStyle = this.color.fill;
+        this.moveTo(this.pinkTrombone.tract.nose.start, -this.offset.nose);
         for(let index = 1; index < this.pinkTrombone.tract.nose.length; index++)
-            this.tractContext.lineTo(index + this.pinkTrombone.tract.nose.start, -this.offset.nose - this.pinkTrombone.tract.nose.diameter[index] * 0.9);
+            this.lineTo(index + this.pinkTrombone.tract.nose.start, -this.offset.nose - this.pinkTrombone.tract.nose.diameter[index] * 0.9);
         for(let index = this.pinkTrombone.tract.nose.length - 1; index >= 1; index--)
-            this.tractContext.lineTo(index + this.pinkTrombone.tract.start.nose, -this.offset.nose);
-        this.tractContext.closePath();
-        this.tractContext.fill();
+            this.lineTo(index + this.pinkTrombone.tract.nose.start, -this.offset.nose);
+        this.context.closePath();
+        this.context.fill();
 
-        this.tractContext.beginPath();
-        this.tractContext.lineWidth = 2;
-        this.tractContext.strokeStyle = this.tractContext.fillStyle = this.color.fill;
-        this.moveTo(this.pinkTrombone.tract.start.nose - 2, 0);
-        this.lineTo(this.pinkTrombone.tract.start.nose, -this.offset.nose);
-        this.lineTo(this.pinkTrombone.tract.start.nose + velumAngle, -this.offset.nose);
-        this.lineTo(this.pinkTrombone.tract.start.nose + velumAngle - 2, 0);
-        this.tractContext.closePath();
-        this.tractContext.stroke();
-        this.tractContext.fill();
+        this.context.beginPath();
+        this.context.lineWidth = 2;
+        this.context.strokeStyle = this.context.fillStyle = this.color.fill;
+        this.moveTo(this.pinkTrombone.tract.nose.start - 2, 0);
+        this.lineTo(this.pinkTrombone.tract.nose.start, -this.offset.nose);
+        this.lineTo(this.pinkTrombone.tract.nose.start + velumAngle, -this.offset.nose);
+        this.lineTo(this.pinkTrombone.tract.nose.start + velumAngle - 2, 0);
+        this.context.closePath();
+        this.context.stroke();
+        this.context.fill();
 
-        this.tractContext.fillStyle = "white";
-        this.tractContext.font = "20px Arial";
-        this.tractContext.textAlign = "center";
-        this.tractContext.globalAlpha = 1.0;
+        this.context.fillStyle = "white";
+        this.context.font = "20px Arial";
+        this.context.textAlign = "center";
+        this.context.globalAlpha = 1.0;
         this.drawText(this.pinkTrombone.tract.length * 0.10, 0.425, "throat");
         this.drawText(this.pinkTrombone.tract.length * 0.71, -1.8, "nasal");
         this.drawText(this.pinkTrombone.tract.length * 0.71, -1.3, "cavity");
-        this.tractContext.font = "22px Arial";
+        
+        this.context.font = "22px Arial";
         this.drawText(this.pinkTrombone.tract.length * 0.6, 0.9, "oral");
         this.drawText(this.pinkTrombone.tract.length * 0.7, 0.9, "cavity");
 
         this.drawAmplitudes();
 
-        this.tractContext.beginPath();
-        this.tractContext.lineWidth = 5;
-        this.tractContext.strokeStyle = this.color.line;
-        this.tractContext.lineJoin = this.tractContext.lineCap = 'round';
+        this.context.beginPath();
+        this.context.lineWidth = 5;
+        this.context.strokeStyle = this.color.line;
+        this.context.lineJoin = this.context.lineCap = 'round';
         this.moveTo(1, this.pinkTrombone.tract.diameter[0]);
         for (let index = 2; index < this.pinkTrombone.tract.length; index++)
             this.lineTo(index, this.pinkTrombone.tract.diameter[index]);
         this.moveTo(1, 0);
-        for (let index = 2; index <= this.pinkTrombone.tract.start.nose - 2; index++)
+        for (let index = 2; index <= this.pinkTrombone.tract.nose.start - 2; index++)
             this.lineTo(index, 0);
-        this.moveTo(this.pinkTrombone.tract.start.nose + velumAngle - 2, 0);
-        for (let index = this.pinkTrombone.tract.start.nose + Math.ceil(velumAngle) - 2; index < this.pinkTrombone.tract.length; index++)
+        this.moveTo(this.pinkTrombone.tract.nose.start + velumAngle - 2, 0);
+        for (let index = this.pinkTrombone.tract.nose.start + Math.ceil(velumAngle) - 2; index < this.pinkTrombone.tract.length; index++)
             this.lineTo(index, 0);
-        this.tractContext.stroke();
+        this.context.stroke();
 
-        this.tractContext.beginPath();
-        this.tractContext.lineWidth = 5;
-        this.tractContext.strokeStyle = this.color.line;
-        this.tractContext.lineJoin = "round";
-        this.moveTo(this.pinkTrombone.tract.start.nose, -this.offset.nose);
+        this.context.beginPath();
+        this.context.lineWidth = 5;
+        this.context.strokeStyle = this.color.line;
+        this.context.lineJoin = "round";
+        this.moveTo(this.pinkTrombone.tract.nose.start, -this.offset.nose);
         for(let index = 1; index < this.pinkTrombone.tract.nose.length; index++)
-            this.lineTo(index + this.pinkTrombone.tract.start.nose, -this.offset.nose - this.pinkTrombone.tract.nose.diameter[index] * 0.9);
-        this.moveTo(this.pinkTrombone.tract.start.nose + velumAngle, -this.offset.nose);
+            this.lineTo(index + this.pinkTrombone.tract.nose.start, -this.offset.nose - this.pinkTrombone.tract.nose.diameter[index] * 0.9);
+        this.moveTo(this.pinkTrombone.tract.nose.start + velumAngle, -this.offset.nose);
         for(let index = Math.ceil(velumAngle); index < this.pinkTrombone.tract.nose.length; index++)
-            this.lineTo(index + this.pinkTrombone.tract.start.nose, -this.offset.nose);
-        this.tractContext.stroke();
+            this.lineTo(index + this.pinkTrombone.tract.nose.start, -this.offset.nose);
+        this.context.stroke();
 
-        this.tractContext.globalAlpha = velum * 5;
-        this.tractContext.beginPath();
-        this.moveTo(this.pinkTrombone.tract.start.nose-2, 0);
-        this.lineTo(this.pinkTrombone.tract.start.nose, -this.offset.nose);
-        this.moveTo(this.pinkTrombone.tract.start.nose + velumAngle - 2, 0);
-        this.lineTo(this.pinkTrombone.tract.start.nose + velumAngle, -this.offset.nose);
-        this.tractContext.stroke();
+        this.context.globalAlpha = velum * 5;
+        this.context.beginPath();
+        this.moveTo(this.pinkTrombone.tract.nose.start-2, 0);
+        this.lineTo(this.pinkTrombone.tract.nose.start, -this.offset.nose);
+        this.moveTo(this.pinkTrombone.tract.nose.start + velumAngle - 2, 0);
+        this.lineTo(this.pinkTrombone.tract.nose.start + velumAngle, -this.offset.nose);
+        this.context.stroke();
 
-        this.tractContext.fillStyle = "orchid";
-        this.tractContext.font = "20px Arial";
-        this.tractContext.textAlign = "center";
-        this.tractContext.globalAlpha = 0.7;
+        this.context.fillStyle = "orchid";
+        this.context.font = "20px Arial";
+        this.context.textAlign = "center";
+        this.context.globalAlpha = 0.7;
         this.drawText(this.pinkTrombone.tract.length * 0.95, 0.8 + 0.8 * this.pinkTrombone.tract.diameter[this.pinkTrombone.tract.length - 1], " lip");
 
-        this.tractContext.globalAlpha = 1.0;
-        this.tractContext.fillStyle = "black";
-        this.tractContext.textAlign = "left";
-        //this.tractContext.fillText(UI.debugText, 20, 20); // access to UI debugText?
+        this.context.globalAlpha = 1.0;
+        this.context.fillStyle = "black";
+        this.context.textAlign = "left";
+        //this.context.fillText("debugText", 20, 20);
     }
 
     drawBackground() {
-        this.backContext.fillStyle = "orchid";
-        this.backContext.font = "20px Arial";
-        this.backContext.textAlign = "center";
-        this.backContext.globalAlpha = 0.7;
+        this.context = this.backContext;
+
+        this.context.fillStyle = "orchid";
+        this.context.font = "20px Arial";
+        this.context.textAlign = "center";
+        this.context.globalAlpha = 0.7;
         this.drawText(this.pinkTrombone.tract.length * 0.44, -0.28, "soft");
         this.drawText(this.pinkTrombone.tract.length * 0.51, -0.28, "palate");
         this.drawText(this.pinkTrombone.tract.length * 0.77, -0.28, "hard");
         this.drawText(this.pinkTrombone.tract.length * 0.84, -0.28, "palate");
         this.drawText(this.pinkTrombone.tract.length * 0.95, -0.28, "lip");
 
-        this.backContext.font = "17px Arial";
+        this.context.font = "17px Arial";
         this.drawTextStraight(this.pinkTrombone.tract.length * 0.18, 3, " tongue control");
-        this.backContext.textAlign = "left";
+        this.context.textAlign = "left";
         this.drawText(this.pinkTrombone.tract.length * 1.03, -1.07, "nasals");
         this.drawText(this.pinkTrombone.tract.length * 1.03, -0.28, "stops");
         this.drawText(this.pinkTrombone.tract.length * 1.03, 0.51, "fricatives");
         
-        this.backContext.strokeStyle = "orchid";
-        this.backContext.lineWidth = 2;
-        this.backContext.beginPath();
+        this.context.strokeStyle = "orchid";
+        this.context.lineWidth = 2;
+        this.context.beginPath();
         this.moveTo(this.pinkTrombone.tract.length * 1.03, 0);
             this.lineTo(this.pinkTrombone.tract.length * 1.07, 0);
         this.moveTo(this.pinkTrombone.tract.length * 1.03, -this.offset.nose);
             this.lineTo(this.pinkTrombone.tract.length * 1.07, -this.offset.nose);
-        this.backContext.stroke();
-        this.backContext.globalAlpha = 0.9;
-        this.backContext.globalAlpha = 1.0;
+        this.context.stroke();
+        this.context.globalAlpha = 0.9;
+        this.context.globalAlpha = 1.0;
+
+        this.context = this.tractContext;
     }
 
     drawPositions() {
-        this.tractContext.fillStyle = "orchid";
-        this.tractContext.font = "24px Arial";
-        this.tractContext.textAlign = "center";
-        this.tractContext.globalAlpha = 0.6;
+        this.context.fillStyle = "orchid";
+        this.context.font = "24px Arial";
+        this.context.textAlign = "center";
+        this.context.globalAlpha = 0.6;
         
         const a = 2;
         const b = 1.5;
@@ -301,7 +314,7 @@ class TractUI {
         const stops = -0.4;
         const fricatives = 0.3;
         const approximants = 1.1;
-        this.tractContext.globalAlpha = 0.8;
+        this.context.globalAlpha = 0.8;
 
         this.drawText(38, approximants, 'l');
         this.drawText(41, approximants, 'w');
@@ -335,50 +348,51 @@ class TractUI {
     }
 
     drawAmplitudes() {
-        this.tractContext.strokeStyle = "orchid";
-        this.tractContext.lineCap = "butt";
-        this.tractContext.globalAlpha = 0.3;
+        this.context.strokeStyle = "orchid";
+        this.context.lineCap = "butt";
+        this.context.globalAlpha = 0.3;
+        
         for(let index = 2; index < this.pinkTrombone.tract.length - 1; index++) {
-            this.tractContext.beginPath();
-            this.tractContext.lineWidth = Math.sqrt(this.pinkTrombone.tract.amplitude.max[index])*3;
+            this.context.beginPath();
+            this.context.lineWidth = Math.sqrt(this.pinkTrombone.tract.amplitude.max[index])*3;
             this.moveTo(index, 0);
             this.lineTo(index, this.pinkTrombone.tract.diameter[index]);
-            this.tractContext.stroke();
+            this.context.stroke();
         }
 
         for(let index = 1; index < this.pinkTrombone.tract.nose.length - 1; index++) {
-            this.tractContext.beginPath();
-            this.tractContext.lineWidth = Math.sqrt(this.pinkTrombone.tract.nose.amplitude.max[index])*3;
+            this.context.beginPath();
+            this.context.lineWidth = Math.sqrt(this.pinkTrombone.tract.nose.amplitude.max[index])*3;
             this.moveTo(index+this.pinkTrombone.tract.nose.start, -this.offset.nose);
             this.lineTo(index+this.pinkTrombone.tract.nose.start, -this.offset.nose - this.pinkTrombone.tract.nose.diameter[index]*0.9);
-            this.tractContext.stroke();
+            this.context.stroke();
         }
 
-        this.tractContext.globalAlpha = 1;
+        this.context.globalAlpha = 1;
     }
 
     drawTongueControl() {
-        this.tractContext.lineCap = this.tractContext.lineJoin = "round";
-        this.tractContext.strokeStyle = this.tractContext.fillStyle = TractUI.palePink;
-        this.tractContext.globalAlpha = 1.0;
-        this.tractContext.beginPath();
-        this.tractContext.lineWidth = 45;
+        this.context.lineCap = this.context.lineJoin = "round";
+        this.context.strokeStyle = this.context.fillStyle = TractUI.palePink;
+        this.context.globalAlpha = 1.0;
+        this.context.beginPath();
+        this.context.lineWidth = 45;
 
         this.moveTo(this.tongue.indexBound.lower, this.tongue.controlRadius.inner);
         for(let index = this.tongue.indexBound.lower+1; index <= this.tongue.indexBound.upper; index++)
             this.lineTo(index, this.tongue.controlRadius.inner);
         this.lineTo(this.tongue.indexCenter, this.tongue.controlRadius.outer);
-        this.tractContext.closePath();
-        this.tractContext.stroke();
-        this.tractContext.fill();
+        this.context.closePath();
+        this.context.stroke();
+        this.context.fill();
 
         const a = this.tongue.controlRadius.inner;
         const c = this.tongue.controlRadius.outer;
         const b = 0.5 * (a+c);
         const r = 3;
 
-        this.tractContext.fillStyle = "orchid";
-        this.tractContext.globalAlpha = 0.3;
+        this.context.fillStyle = "orchid";
+        this.context.globalAlpha = 0.3;
         this.drawCircle(this.tongue.indexCenter, a, r);
         this.drawCircle(this.tongue.indexCenter - 4.25, a, r);
         this.drawCircle(this.tongue.indexCenter - 8.5, a, r);
@@ -389,23 +403,23 @@ class TractUI {
         this.drawCircle(this.tongue.indexCenter, b, r);
         this.drawCircle(this.tongue.indexCenter, c, r);
 
-        this.tractContext.globalAlpha = 1.0;
+        this.context.globalAlpha = 1.0;
 
         const angle = this.angle.offset + this.tongue.index * this.angle.scale * Math.PI / (this.pinkTrombone.tract.start.lip-1);
         const r2 = this.radius - this.scale*(this.tongue.diameter);
         const x = this.origin.x - r2 * Math.cos(angle);
         const y = this.origin.y - r2 * Math.sin(angle);
         
-        this.tractContext.lineWidth = 4;
-        this.tractContext.strokeStyle = "orchid";
-        this.tractContext.globalAlpha = 0.7;
-        this.tractContext.beginPath();
-        this.tractContext.arc(x , y, 18, 0, 2*Math.PI);
-        this.tractContext.stroke();
-        this.tractContext.globalAlpha = 0.15;
-        this.tractContext.fill();
-        this.tractContext.globalAlpha = 1.0;
-        this.tractContext.fillStyle = "orchid";
+        this.context.lineWidth = 4;
+        this.context.strokeStyle = "orchid";
+        this.context.globalAlpha = 0.7;
+        this.context.beginPath();
+        this.context.arc(x , y, 18, 0, 2*Math.PI);
+        this.context.stroke();
+        this.context.globalAlpha = 0.15;
+        this.context.fill();
+        this.context.globalAlpha = 1.0;
+        this.context.fillStyle = "orchid";
     }
 
     drawPitchControl() {
@@ -413,19 +427,19 @@ class TractUI {
         const h = 15;
 
         if(this.pinkTrombone.glottis.x) {
-            this.tractContext.lineWidth = 4;
-            this.tractContext.strokeStyle = "orchid";
-            this.tractContext.globalAlpha = 0.7;
-            this.tractContext.beginPath();
-            this.tractContext.moveTo(this.pinkTrombone.glottis.x-w, this.pinkTrombone.glottis.y-h);
-            this.tractContext.lineTo(this.pinkTrombone.glottis.x+w, this.pinkTrombone.glottis.y-h);
-            this.tractContext.lineTo(this.pinkTrombone.glottis.x+w, this.pinkTrombone.glottis.y+h);
-            this.tractContext.lineTo(this.pinkTrombone.glottis.x-w, this.pinkTrombone.glottis.y+h);
-            this.tractContext.closePath();
-            this.tractContext.stroke();
-            this.tractContext.globalAlpha = 0.15;
-            this.tractContext.fill();
-            this.tractContext.globalAlpha = 1.0;
+            this.context.lineWidth = 4;
+            this.context.strokeStyle = "orchid";
+            this.context.globalAlpha = 0.7;
+            this.context.beginPath();
+            this.context.moveTo(this.pinkTrombone.glottis.x-w, this.pinkTrombone.glottis.y-h);
+            this.context.lineTo(this.pinkTrombone.glottis.x+w, this.pinkTrombone.glottis.y-h);
+            this.context.lineTo(this.pinkTrombone.glottis.x+w, this.pinkTrombone.glottis.y+h);
+            this.context.lineTo(this.pinkTrombone.glottis.x-w, this.pinkTrombone.glottis.y+h);
+            this.context.closePath();
+            this.context.stroke();
+            this.context.globalAlpha = 0.15;
+            this.context.fill();
+            this.context.globalAlpha = 1.0;
         }
     }
 
@@ -478,7 +492,7 @@ class TractUI {
 
         this.setRestDiameter();
         for(let index = 0; index < this.pinkTrombone.tract.length; index++)
-        this.pinkTrombone.tract.diameter.target[index] = this.pinkTrombone.tract.diameter.rest[index];
+            this.pinkTrombone.tract.diameter.target[index] = this.pinkTrombone.tract.diameter.rest[index];
         
         this.pinkTrombone.tract.velum.target = 0.01;
         touches.forEach(touch => {
@@ -489,7 +503,8 @@ class TractUI {
             const y = touch.y;
             const index = this.getIndex(x, y);
             var diameter = this.getDiameter(x, y);
-            if(index > this.pinkTrombone.tract.start.nose && diameter < -this.offset.nose)
+            
+            if(index > this.pinkTrombone.tract.nose.start && diameter < -this.offset.nose)
                 this.pinkTrombone.tract.velum.target = 0.4;
             
             this.temp.a = index;
@@ -501,7 +516,7 @@ class TractUI {
             diameter -= 0.3;
 
             if(diameter < 0)
-                return;
+                diameter = 0;
             
             var width = 2;
             if(index < 25)
@@ -532,7 +547,9 @@ class TractUI {
                         this.pinkTrombone.tract.diameter.target[intIndex + _index] = diameter + (this.pinkTrombone.tract.diameter.target[intIndex + _index] - diameter) * shrink;
                 }
             }
-         })
+         });
+
+         // SET
     }
 }
 

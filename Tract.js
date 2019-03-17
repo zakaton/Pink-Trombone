@@ -150,11 +150,11 @@ class Tract {
         }
     }
 
-    runStep(glottalOutput, turbulenceNoise, lambda, noiseModulator) {
+    runStep(glottalOutput, turbulenceNoise, lambda, noiseModulator, touches) {
         const updateAmplitudes = (Math.random() < 0.1);
 
         this.processTransients();
-        this.addTurbulenceNoise(turbulenceNoise, noiseModulator);
+        this.addTurbulenceNoise(turbulenceNoise, noiseModulator, touches);
 
         this.junctionOutput.right[0] = this.left[0] * this.reflection.glottal + glottalOutput;
         this.junctionOutput.left[this.length] = this.right[this.length-1] * this.reflection.lip;
@@ -272,8 +272,18 @@ class Tract {
         this.nose.A[0] = Math.pow(this.nose.diameter[0], 2);
     }
 
-    addTurbulenceNoise(turbulenceNoise, noiseModulator) {
-        // fill
+    addTurbulenceNoise(turbulenceNoise, noiseModulator, touches) {
+        for(let index = 0; index < touches.length; index++) {
+            const touch = touches[index];
+            if(touch.index < 2 || touch.index > this.length)
+                continue;
+            if(touch.diameter <= 0)
+                continue;
+            const intensity = touch.fricative_intensity;
+            if(intensity == 0)
+                continue;
+            this.addTurbulenceNoiseAtIndex(0.66 * turbulenceNoise*intensity, touch.index, touch.diameter, noiseModulator);
+        }
     }
 
     addTurbulenceNoiseAtIndex(turbulenceNoise, index, diameter, noiseModulator) {
@@ -285,7 +295,7 @@ class Tract {
         
         turbulenceNoise *= noiseModulator;
         const thinness = Math.clamp(8 * (0.7 - diameter), 0, 1);
-        const openness = Math.clamp(30(diameter-0.3), 0, 1);
+        const openness = Math.clamp(30*(diameter-0.3), 0, 1);
         
         const noise = [1, 0].map(_index => turbulenceNoise * indexComplements[_index] * thinness * openness);
 
@@ -294,10 +304,6 @@ class Tract {
             this[direction][index+2] += noise[1]/2;
         });
     }
-
-    handleTouches(event) {
-
-    }
 }
 
-export default Tract
+export default Tract;

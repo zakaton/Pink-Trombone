@@ -10,6 +10,8 @@ class PinkTromboneProcessor extends AudioWorkletProcessor {
         this.glottis = new Glottis();
         this.tract = new Tract();
 
+        this.touches = [];
+
         this.alwaysVoice = true;
         this.alwaysWobble = true;
         
@@ -25,6 +27,9 @@ class PinkTromboneProcessor extends AudioWorkletProcessor {
 
                     const message = Object.assign(event.data, {value : JSON.stringify(value)});
                     this.port.postMessage(message);
+                    break;
+                case "touchEvent":
+                    this.touches = event.data.value;
                     break;
                 default:
                     break;
@@ -102,9 +107,9 @@ class PinkTromboneProcessor extends AudioWorkletProcessor {
 
         var outputSample = 0;
 
-        this.tract.runStep(glottisSample, turbulenceNoiseSample, lambda1, this.glottis.noiseModulator);
+        this.tract.runStep(glottisSample, turbulenceNoiseSample, lambda1, this.glottis.noiseModulator, this.touches);
             outputSample += this.tract.output.lip + this.tract.output.nose;
-        this.tract.runStep(glottisSample, turbulenceNoiseSample, lambda2, this.glottis.noiseModulator);
+        this.tract.runStep(glottisSample, turbulenceNoiseSample, lambda2, this.glottis.noiseModulator, this.touches);
             outputSample += this.tract.output.lip + this.tract.output.nose;
         
         return outputSample * 0.125;

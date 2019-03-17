@@ -4,8 +4,8 @@ class Glottis {
     constructor() {
         this.noise = new SimplexNoise();
 
-        this.x = 0;
-        this.y = 0;
+        this.x = 240;
+        this.y = 530;
 
         this.time = {
             inWaveform : 0,
