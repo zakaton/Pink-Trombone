@@ -1,6 +1,3 @@
-// setting Values?
-// rendering
-
 class TractUI {
     constructor(pinkTrombone, tractCanvas, backCanvas) {
         this.pinkTrombone = pinkTrombone;
@@ -63,6 +60,10 @@ class TractUI {
         for(let index = 0; index < this.pinkTrombone.tract.length; index++) {
             this.pinkTrombone.tract.diameter[index] = this.pinkTrombone.tract.diameter.target[index] = this.pinkTrombone.tract.diameter.rest[index];
         }
+        this.pinkTrombone.overwrite(
+            ["tract", "diameter"]
+        )
+
         this.drawBackground();
         this.tongue.indexBound.lower = this.pinkTrombone.tract.start.blade + 2;
         this.tongue.indexBound.upper = this.pinkTrombone.tract.start.tip - 3;
@@ -456,6 +457,10 @@ class TractUI {
 
             this.pinkTrombone.tract.diameter.rest[index] = 1.5 - curve;
         }
+
+        this.pinkTrombone.overwrite(
+            ["tract", "diameter", "rest"],
+        );
     }
 
     handleTouches(touches) {
@@ -549,7 +554,10 @@ class TractUI {
             }
          });
 
-         // SET
+         this.pinkTrombone.overwrite(
+             ["tract", "diameter", "target"],
+             ["tract", "velum", "target"],
+         );
     }
 }
 

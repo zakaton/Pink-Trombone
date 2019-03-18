@@ -163,22 +163,15 @@ class GlottisUI {
 
         this.pinkTrombone.glottis.isTouched = (this.touch != 0);
 
-        [
-            ["frequency", "UI"],
-            ["frequency", "smooth"],
-            ["tenseness", "UI"],
-            ["loudness"],
-            ["x"],
-            ["y"],
-            ["isTouched"],
-        ].forEach(messagePath => {
-            const newValue = Object.get(this.pinkTrombone.glottis, ...messagePath);
-            this.pinkTrombone.workletNode.port.postMessage({
-                type : "set",
-                path : ["glottis", ...messagePath],
-                value : JSON.stringify(newValue),
-            });
-        });
+        this.pinkTrombone.overwrite(
+            ["glottis", "frequency", "UI"],
+            ["glottis", "frequency", "smooth"],
+            ["glottis", "tenseness", "UI"],
+            ["glottis", "loudness"],
+            ["glottis", "x"],
+            ["glottis", "y"],
+            ["glottis", "isTouched"]
+        );
     }
 }
 

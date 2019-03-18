@@ -11,7 +11,7 @@ class Glottis {
             inWaveform : 0,
             total : 0,
             get step() {return 1.0 / sampleRate},
-        }
+        };
         
         this.frequency = {
             current : 140,

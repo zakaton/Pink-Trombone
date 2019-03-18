@@ -2,6 +2,7 @@ import Glottis from "/Glottis.js";
 import Tract from "/Tract.js";
 
 import WhiteNoise from "/WhiteNoise.js";
+import Object from "/ObjectExtension.js";
 
 class PinkTrombone {
     constructor(audioContext) {
@@ -66,6 +67,16 @@ class PinkTrombone {
         return Promise.all([WhiteNoise.Load(audioContext), this._Load(audioContext)])
     }
 
+    overwrite(...paths) {
+        paths.forEach(path => {
+            this.workletNode.port.postMessage({
+                type : "set",
+                path : path,
+                value : JSON.stringify(Object.get(this, ...path)),
+            })
+        })
+    }
+
     static get WorkletNode() {
         return class extends AudioWorkletNode {
             constructor(audioContext) {
@@ -117,7 +128,8 @@ class PinkTrombone {
         this.workletNode.port.postMessage({
             type : "get",
             key : "tract",
-        })
+        });
+
     }
 }
 
