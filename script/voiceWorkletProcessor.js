@@ -21,7 +21,7 @@ class VoiceWorkletProcessor extends AudioWorkletProcessor {
 
                     switch(event.data.subtype) {
                         case "add":
-                            const _index = index || this.processor.tract.positions.findIndex(value => (value == undefined));
+                            const _index = index || Math.max(0, this.processor.tract.positions.findIndex(value => (value == undefined)));
                             this.processor.tract.positions[_index] = position;
                             break;
                         case "move":
