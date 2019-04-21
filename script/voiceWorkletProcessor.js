@@ -3,7 +3,7 @@
         figure when to update tongue...
 */
 
-import VoiceProcessor from "./voiceProcessor.js";
+import VoiceProcessor from "./VoiceProcessor.js";
 
 class VoiceWorkletProcessor extends AudioWorkletProcessor {
     constructor() {
