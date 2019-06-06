@@ -82,12 +82,12 @@ class Glottis {
             noise *= noiseModulator;
             noise *= tenseness;
             noise *= intensity;
-            //noise *= intensity;
+            noise *= intensity;
             noise *= (1 - Math.sqrt(Math.max(tenseness, 0)));
             noise *= (0.02*this.noise.simplex1(seconds*1.99)) + 0.2;
 
         var voice = this._getNormalizedWaveform(interpolation);
-            //voice *= intensity;
+            voice *= intensity;
             voice *= loudness;
 
         outputSample = noise + voice;

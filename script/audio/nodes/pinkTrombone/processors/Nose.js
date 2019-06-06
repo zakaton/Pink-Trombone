@@ -5,8 +5,6 @@
 
 class Nose {
     constructor(tract) {
-        this.tract = tract;
-
         this.length = Math.floor(28 * tract.length / 44);
 
         this.start = tract.length - this.length + 1;

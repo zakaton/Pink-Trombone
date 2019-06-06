@@ -61,6 +61,9 @@ class Tract {
                     get range() {
                         return this.maxValue - this.minValue;
                     },
+                    get center() { // for rendering
+                        return (this.maxValue + this.minValue)/2;
+                    },
                     interpolation(diameterValue) {
                         const interpolation = (diameterValue - this.minValue) / this.range;
                         return Math.clamp(interpolation, 0, 1);

@@ -1,6 +1,6 @@
 /*
     TODO
-        *
+        getProcessorEvent
 */
 
 import ParameterDescriptors from "./ParameterDescriptors.js";
@@ -26,6 +26,11 @@ class PinkTromboneWorkletProcessor extends AudioWorkletProcessor {
 
                 case "enabledConstrictionIndices":
                     event.data.enabledConstrictionIndices = this.enabledConstrictionIndices;
+                    this.port.postMessage(event.data);
+                    break;
+                
+                case "getProcessor":
+                    event.data.processor = JSON.stringify(this.processor);
                     this.port.postMessage(event.data);
                     break;
                 default:

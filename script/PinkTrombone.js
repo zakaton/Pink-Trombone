@@ -34,46 +34,57 @@ class PinkTrombone {
     }
 
     setupAudioGraph() {
-        this.noise = this.audioContext.createNoise();
+        this._noise = this.audioContext.createNoise();
 
-        this.aspirateFilter = this.audioContext.createBiquadFilter();
-                this.aspirateFilter.type = "bandpass";
-                this.aspirateFilter.frequency.value = 500;
-                this.aspirateFilter.Q.value = 0.5;
+        this._aspirateFilter = this.audioContext.createBiquadFilter();
+                this._aspirateFilter.type = "bandpass";
+                this._aspirateFilter.frequency.value = 500;
+                this._aspirateFilter.Q.value = 0.5;
             
-        this.fricativeFilter = this.audioContext.createBiquadFilter();
-            this.fricativeFilter.type = "bandpass";
-            this.fricativeFilter.frequency.value = 1000;
-            this.fricativeFilter.Q.value = 0.5;
+        this._fricativeFilter = this.audioContext.createBiquadFilter();
+            this._fricativeFilter.type = "bandpass";
+            this._fricativeFilter.frequency.value = 1000;
+            this._fricativeFilter.Q.value = 0.5;
 
-        this.pinkTromboneNode = this.audioContext.createPinkTromboneNode();
+        this._pinkTromboneNode = this.audioContext.createPinkTromboneNode();
 
-        this.noise.connect(this.aspirateFilter);
-            this.aspirateFilter.connect(this.pinkTromboneNode.noise);
+        this._noise.connect(this._aspirateFilter);
+            this._aspirateFilter.connect(this._pinkTromboneNode.noise);
 
-        this.noise.connect(this.fricativeFilter);
-            this.fricativeFilter.connect(this.pinkTromboneNode.noise);
+        this._noise.connect(this._fricativeFilter);
+            this._fricativeFilter.connect(this._pinkTromboneNode.noise);
+    }
+
+    get parameters() {
+        return this._pinkTromboneNode._parameters;
     }
 
     connect() {
-        return this.pinkTromboneNode.connect(...arguments);
+        return this._pinkTromboneNode.connect(...arguments);
     }
     disconnect() {
-        return this.pinkTromboneNode.disconnect(...arguments);
+        return this._pinkTromboneNode.disconnect(...arguments);
     }
 
     start() {
-        this.noise.start();
+        this._noise.start();
     }
     stop() {
-        this.noise.stop();
+        this._noise.stop();
     }
 
+    get constrictions() {
+        return this._pinkTromboneNode.constrictions;
+    }
     newConstriction() {
-        return this.pinkTromboneNode.newConstriction(...arguments);
+        return this._pinkTromboneNode.newConstriction(...arguments);
     }
     removeConstriction(constriction) {
-        this.pinkTromboneNode.removeConstriction(constriction);
+        this._pinkTromboneNode.removeConstriction(constriction);
+    }
+
+    getProcessor() {
+        return this._pinkTromboneNode.getProcessor();
     }
 }
 

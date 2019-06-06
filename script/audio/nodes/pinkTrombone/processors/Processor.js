@@ -22,6 +22,7 @@ class Processor {
             sampleIndex = 0.5; // process twice - note the "...arguments" doesn't read this
         outputSample += this.tract.process(parameterSamples, sampleIndex, bufferLength, seconds, constrictions);
 
+        outputSample *= 0.125;
         return outputSample;
     }
 

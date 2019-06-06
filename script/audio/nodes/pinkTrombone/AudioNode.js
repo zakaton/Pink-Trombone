@@ -1,6 +1,6 @@
 /*
     TODO
-        *
+        .getProcessor()
 */
 
 import ParameterDescriptors from "./processors/workletProcessors/ParameterDescriptors.js";
@@ -13,6 +13,8 @@ function setupNode(audioNode) {
     audioNode._constrictions = [];
     for(let constrictionIndex = 0; constrictionIndex < ParameterDescriptors.numberOfConstrictions; constrictionIndex++) {
         audioNode._constrictions[constrictionIndex] = {
+            _index : constrictionIndex,
+
             index : null,
             diameter : null,
 
@@ -42,11 +44,13 @@ function setupNode(audioNode) {
         }
     });
 
-    audioNode.tongue = {
+    audioNode._parameters = {};
+
+    audioNode.tongue = audioNode._parameters.tongue = {
         index : null,
-        diamter : null,
+        diameter : null,
     };
-    audioNode.vibrato = {
+    audioNode.vibrato = audioNode._parameters.vibrato = {
         frequency : null,
         gain : null,
         wobble : null,
@@ -68,7 +72,7 @@ function assignAudioParam(audioNode, audioParam, paramName) {
         audioNode.tongue[paramName.replace("tongue", '').toLowerCase()] = audioParam;
     }
     else {
-        audioNode[paramName] = audioParam;    
+        audioNode[paramName] = audioNode._parameters[paramName] = audioParam;    
     }
 }
 
@@ -123,6 +127,14 @@ if(window.AudioWorklet) {
                 constrictionIndex : constrictionIndex,
             }).then(() => {
                 this._constrictions[constrictionIndex]._isEnabled = false; 
+            });
+        }
+
+        getProcessor() {
+            return this._postMessage({
+                name : "getProcessor",
+            }).then(event => {
+                return JSON.parse(event.data.processor);
             });
         }
     }
@@ -221,6 +233,12 @@ else {
         }
         pinkTromboneNode._disableConstriction = function() {
             this._constrictions[constrictionIndex]._isEnabled = false;
+        }
+
+        pinkTromboneNode.getProcessor = function() {
+            return new Promise((resolve, reject) => {
+                resolve(this.processor);
+            });
         }
 
         return pinkTromboneNode;
