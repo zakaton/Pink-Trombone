@@ -1,10 +1,11 @@
 /*
     TODO
-        .getProcessor()
+        *
 */
 
 import ParameterDescriptors from "./processors/workletProcessors/ParameterDescriptors.js";
 import Processor from "./processors/Processor.js";
+import {} from "../constantSource/AudioNode.js";
 
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
@@ -25,9 +26,15 @@ function setupNode(audioNode) {
         };
     }
 
-    audioNode.newConstriction = function() {
+    audioNode.newConstriction = function(index, diameter) {
         return this._constrictions.find(constriction => {
             if(!constriction._isEnabled) {
+                if(index !== undefined)
+                    constriction.index.value = index;
+
+                if(diameter !== undefined)
+                    constriction.diameter.value = diameter;
+
                 constriction._enable();
                 return true;
             }
@@ -76,8 +83,7 @@ function assignAudioParam(audioNode, audioParam, paramName) {
     }
 }
 
-if(window.AudioWorklet) {
-
+if(window.AudioWorklet !== undefined) {
     class PinkTromboneNode extends AudioWorkletNode {
         constructor(audioContext) {
             super(audioContext, "pink-trombone-worklet-processor");
@@ -145,7 +151,7 @@ if(window.AudioWorklet) {
 }
 else {
     window.AudioContext.prototype.createPinkTromboneNode = function() {
-        const pinkTromboneNode = this.createScriptProcessor(Math.pow(2, 12), ParameterDescriptors.length, 1);
+        const pinkTromboneNode = this.createScriptProcessor(Math.pow(2, 9), ParameterDescriptors.length, 1);
         pinkTromboneNode.processor = new Processor();
 
         setupNode(pinkTromboneNode);
@@ -167,6 +173,7 @@ else {
 
             assignAudioParam(pinkTromboneNode, audioParam, parameterDescriptor.name);
         });
+
 
         pinkTromboneNode._getParameterChannels = function(inputBuffer) {
             const parameterChannels = {};

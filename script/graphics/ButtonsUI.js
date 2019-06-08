@@ -1,6 +1,6 @@
 /*
     TODO
-        *
+        Toggle phonemes (voice/voiceless/none)
 */
 
 class ButtonsUI {
@@ -23,7 +23,7 @@ class ButtonsUI {
         const button = document.createElement("button");
                 button.id = buttonName;
                 button.value = true;
-                button.innerText = buttonName;
+                button.innerText = "disable " + buttonName;
                 button.style.width = "100%";
                 button.style.flex = 1;
                 button.style.margin = "2px";
@@ -34,6 +34,11 @@ class ButtonsUI {
 
             button.addEventListener("click", event => {
                 button.value = (button.value == "false");
+
+                const prefix = (button.value == "true")?
+                    "disable" :
+                    "enable";
+                button.innerText = prefix + ' ' + button.id;
                 
                 const customEvent = new CustomEvent("setParameter", {
                     bubbles : true,

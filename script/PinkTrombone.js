@@ -17,7 +17,7 @@ class PinkTrombone {
             ]);
         }
         else {
-            return new Promise(resolve => {
+            return new Promise((resolve, reject) => {
                 resolve();
             });
         }

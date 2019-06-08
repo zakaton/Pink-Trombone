@@ -1,6 +1,6 @@
 /*
     TODO
-        fix voiceless slider issue
+        mousedown turns on voice/loudness and VV
         refactor
 */
 

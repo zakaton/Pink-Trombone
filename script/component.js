@@ -7,6 +7,8 @@
 import {} from "./PinkTrombone.js";
 import PinkTromboneUI from "./graphics/PinkTromboneUI.js";
 
+window.AudioContext = window.AudioContext || window.webkitAudioContext;
+
 class PinkTromboneElement extends HTMLElement {
     constructor() {
         super();
@@ -65,12 +67,14 @@ class PinkTromboneElement extends HTMLElement {
 
                     // Constrictions
                     this.addEventListener("newConstriction", event => {
-                        const constriction = this.newConstriction();
-                        
+                        const {index, diameter} = event.detail;
+                        const constriction = this.newConstriction(index, diameter);
+
+                        const detail = event.detail;
+                        detail.constrictionIndex = constriction._index;
+
                         const customEvent = new CustomEvent("didNewConstriction", {
-                            detail : {
-                                constrictionIndex : constriction._index,
-                            }
+                            detail : detail,
                         });
 
                         event.target.dispatchEvent(customEvent);
@@ -80,20 +84,20 @@ class PinkTromboneElement extends HTMLElement {
                     this.addEventListener("setConstriction", event => {
                         const constrictionIndex = Number(event.detail.constrictionIndex);
                         const constriction = this.constrictions[constrictionIndex];
+
+                        if(constriction) {
+                            const {index, diameter} = event.detail;
+
+                            if(index !== undefined)
+                                constriction.index.value = index;
+
+                            if(diameter !== undefined)
+                                constriction.diameter.value = diameter;
+                            
+                            const customEvent = new CustomEvent("didSetConstriction");
+                            event.target.dispatchEvent(customEvent);
+                        }
                         
-                        // can add more details such as the delay and curve (smoothness and stuff)
-
-                        const {index, diameter} = event.detail;
-
-                        if(index)
-                            constriction.index.value = Number(index);
-
-                        if(diameter)
-                            constriction.diameter.value = Number(index);
-                        
-                        const customEvent = new CustomEvent("didSetConstriction");
-                        this.target.dispatchEvent(customEvent);
-
                         event.stopPropagation();
                     });
                     this.addEventListener("getConstriction", event => {
@@ -106,7 +110,7 @@ class PinkTromboneElement extends HTMLElement {
                                 diameter : constriction.diameter.value,
                             },
                         });
-                        this.target.dispatchEvent(customEvent);
+                        event.target.dispatchEvent(customEvent);
 
                         event.stopPropagation();
                     });
@@ -114,9 +118,13 @@ class PinkTromboneElement extends HTMLElement {
                         const constrictionIndex = Number(event.detail.constrictionIndex);
                         const constriction = this.constrictions[constrictionIndex];
                         this.removeConstriction(constriction);
+
+                        const detail = event.detail;
                         
-                        const customEvent = new CustomEvent("didRemoveConstriction");
-                        this.target.dispatchEvent(customEvent);
+                        const customEvent = new CustomEvent("didRemoveConstriction", {
+                            detail : detail,
+                        });
+                        event.target.dispatchEvent(customEvent);
 
                         event.stopPropagation();
                     });

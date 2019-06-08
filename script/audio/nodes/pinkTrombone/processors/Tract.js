@@ -1,6 +1,5 @@
 /*
     TODO
-        figure out the neccessity of "target"
         using tongue as a k-rate constriction
 */
 
@@ -8,7 +7,7 @@ import Nose from "./Nose.js";
 import Transient from "./Transient.js";
 
 Math.interpolate = function(interpolation, from, to) {
-    return (from * (1-interpolation)) + (to * (interpolation));
+    return (from * (1-interpolation)) + (to * (interpolation))
 }
 Math.clamp = function(value, minValue, maxValue) {
     return (value <= minValue)?
@@ -49,6 +48,32 @@ class Tract {
         };
 
 
+        // Buffers
+        this.right = new Float64Array(this.length);
+            this.right.junction = new Float64Array(this.length+1);
+            this.right.reflection = {
+                value : 0,
+                new : 0,
+            };
+
+        this.left = new Float64Array(this.length);
+            this.left.junction = new Float64Array(this.length+1);
+            this.left.reflection = {
+                value : 0,
+                new : 0,
+            };
+        
+        this.reflection = new Float64Array(this.length+1);
+            this.reflection.new = new Float64Array(this.length+1);
+        
+        this.amplitude = new Float64Array(this.length);
+            this.amplitude.max = new Float64Array(this.length);
+        
+        this.diameter = new Float64Array(this.length);
+            this.diameter.rest = new Float64Array(this.length);
+            this.diameter.target = new Float64Array(this.length);
+
+
         // Tongue & Nose
         this.tongue = {
             _diameter : 2.43,
@@ -61,7 +86,7 @@ class Tract {
                     get range() {
                         return this.maxValue - this.minValue;
                     },
-                    get center() { // for rendering
+                    get center() {
                         return (this.maxValue + this.minValue)/2;
                     },
                     interpolation(diameterValue) {
@@ -108,8 +133,6 @@ class Tract {
                     Math.clamp(newValue, this.range.index.minValue, this.range.index.maxValue) ;
             },
         };
-        this.nose = new Nose(this);
-
 
         // Transients
         this.transients = [];
@@ -122,33 +145,8 @@ class Tract {
         this.previousConstrictions = [];
             this.previousConstrictions.tongue = {};
 
-
-        // Buffers
-        this.right = new Float64Array(this.length);
-            this.right.junction = new Float64Array(this.length+1);
-            this.right.reflection = {
-                value : 0,
-                new : 0,
-            };
-
-        this.left = new Float64Array(this.length);
-            this.left.junction = new Float64Array(this.length+1);
-            this.left.reflection = {
-                value : 0,
-                new : 0,
-            };
-        
-        this.reflection = new Float64Array(this.length+1);
-            this.reflection.new = new Float64Array(this.length+1);
-        
-        this.amplitude = new Float64Array(this.length);
-            this.amplitude.max = new Float64Array(this.length);
-        
-        this.diameter = new Float64Array(this.length);
-            this.diameter.rest = new Float64Array(this.length);
-            this.diameter.target = new Float64Array(this.length);
-            this.diameter.new = new Float64Array(this.length);
-        
+        // NOSE
+        this.nose = new Nose(this);
 
         // diameter.update
         for(let index = 0; index < this.length; index++) {
@@ -164,22 +162,23 @@ class Tract {
             this.diameter[index] = value;
             this.diameter.rest[index] = value;
             this.diameter.target[index] = value;
-            this.diameter.new[index] = value;
         }
 
-
         this._updateDiameterRest();
-
+        
         for(let index = 0; index < this.length; index++) {
             this.diameter[index] = this.diameter.rest[index];
             this.diameter.target[index] = this.diameter.rest[index];
         }
 
         this._updateReflection();
+
+        this.nose.update();
+        this.nose.diameter[0] = this.velum.target;
     }
 
     // PROCESS
-    process(parameterSamples, sampleIndex, bufferLength, seconds, constrictions) {
+    process(parameterSamples, sampleIndex, bufferLength, seconds) {
         this.tongue.diameter = parameterSamples.tongueDiameter;
         this.tongue.index = parameterSamples.tongueIndex;
 
@@ -189,8 +188,7 @@ class Tract {
         const bufferInterpolation = (sampleIndex/bufferLength);
         const updateAmplitudes = (Math.random() < 0.1);
 
-        const outputSample = this._processLips(parameterSamples, bufferInterpolation, updateAmplitudes)
-
+        const outputSample = this._processLips(parameterSamples, bufferInterpolation, updateAmplitudes)// + this._processNose(parameterSamples, bufferInterpolation, updateAmplitudes);
         return outputSample;
     }
 
@@ -209,7 +207,6 @@ class Tract {
         for(let index = 0; index < constrictions.length; index++) {
             const constriction = constrictions[index];
             
-            // 758
             if(constriction.index >= 2 && constriction.index <= this.length && constriction.diameter > 0) {
                 var noise = parameterSamples.glottis;
 
@@ -228,7 +225,7 @@ class Tract {
                 const upperIndex = lowerIndex+1;
                     const upperWeight = upperIndex - constriction.index;
                         const upperNoise = noise * upperWeight;
-
+                    
                 this.right[lowerIndex+1] += lowerNoise;
                 this.right[upperIndex+1] += upperNoise;
 
@@ -241,7 +238,7 @@ class Tract {
     _processLips(parameterSamples, bufferInterpolation, updateAmplitudes) {
         this.right.junction[0] = this.left[0] * this.glottis.reflection + parameterSamples.glottis;
         this.left.junction[this.length] = this.right[this.length-1] * this.lip.reflection;
-
+        
         for(let index = 1; index < this.length; index++) {
             const interpolation = Math.interpolate(bufferInterpolation, this.reflection[index], this.reflection.new[index]);
             const offset = interpolation * (this.right[index-1] + this.left[index]);
@@ -254,6 +251,8 @@ class Tract {
             this.left.junction[ this.nose.start] = leftInterpolation  * this.right[this.nose.start-1] + (leftInterpolation +1) * (this.nose.left[0] + this.left[ this.nose.start  ]);
         const rightInterpolation = Math.interpolate(bufferInterpolation, this.right.reflection.new, this.right.reflection.value);
             this.right.junction[this.nose.start] = rightInterpolation * this.left[ this.nose.start  ] + (rightInterpolation+1) * (this.nose.left[0] + this.right[this.nose.start-1]);
+        const noseInterpolation = Math.interpolate(bufferInterpolation, this.nose.reflection.new, this.nose.reflection.value);
+            this.nose.right.junction[0] = noseInterpolation * this.nose.left[0] + (noseInterpolation + 1) * (this.left[this.nose.start] + this.right[this.nose.start-1]);
 
         for(let index = 0; index < this.length; index++) {
             this.right[index] = this.right.junction[index] * 0.999;
@@ -261,15 +260,43 @@ class Tract {
 
             if(updateAmplitudes) {
                 const sum = Math.abs(this.left[index] + this.right[index]);
+
                 this.amplitude.max[index] = (sum > this.amplitude.max[index])?
                     sum :
                     this.amplitude.max[index] * 0.999;
             }
         }
 
-        //this.lip.output = this.right[this.length-1];
+        const tractOutput = this.right[this.length-1];
 
-        return this.right[this.length-1];
+        // NOSE
+        this.nose.left.junction[this.nose.length] = this.nose.right[this.nose.length-1] * this.lip.reflection;
+
+        if(true)
+        for(let index = 1; index < this.nose.length; index++) {
+            const offset = this.nose.reflection[index] * (this.nose.left[index] * this.nose.right[index-1]);
+
+            this.nose.left.junction[index] = this.nose.left[index] + offset;
+            this.nose.right.junction[index] = this.nose.right[index-1] - offset;
+        }
+
+        if(true)
+        for(let index = 0; index < this.nose.length; index++) {
+            this.nose.left[index] = this.nose.left.junction[index+1] * this.nose.fade;
+            this.nose.right[index] = this.nose.right.junction[index] * this.nose.fade;
+
+            if(updateAmplitudes) {
+                const sum = Math.abs(this.nose.left[index] + this.nose.right[index]);
+                this.nose.amplitude.max[index] = (sum > this.nose.amplitude.max[index])?
+                    sum :
+                    this.nose.amplitude.max[index] * 0.999;
+            }
+        }
+
+        var noseOutput = this.nose.right[this.nose.length-1];
+        
+        return tractOutput + noseOutput;
+        //return this.right[this.length-1];
     }
     _processNose(parameterSamples, bufferInterpolation, updateAmplitudes) {
         this.nose.left.junction[this.nose.length] = this.nose.right[this.nose.length-1] * this.lip.reflection;
@@ -301,18 +328,16 @@ class Tract {
 
     // UPDATE
     update(seconds, constrictions) {
-        this._updateDiameterRest();
-
-        this._updateConstrictions(constrictions);
-
         this._updateTract();
 
         this._updateTransients(seconds);
 
-        this.nose.diameter[0] = this.velum.target; // 307
+        this.nose.diameter[0] = this.velum.target;
         this.nose.amplitude[0] = Math.pow(this.nose.diameter[0], 2);
 
         this._updateReflection();
+
+        this._updateConstrictions(constrictions);
     }
 
     _updateDiameterRest() {
@@ -337,14 +362,10 @@ class Tract {
     }
 
     _updateConstrictions(constrictions) {
-        // 632
-
         var update = false;
 
-        // check if tongue was changed
         update = update || (this.tongue.index !== this.previousConstrictions.tongue.index) || (this.tongue.diameter !== this.previousConstrictions.tongue.diameter);
 
-        // check if any constriction has changed
         const maxIndex = Math.max(this.previousConstrictions.length, constrictions.length);
         for(let constrictionIndex = 0, A = constrictions[0], B = this.previousConstrictions[0]; !update && constrictionIndex < maxIndex; constrictionIndex++, A = constrictions[constrictionIndex], B = this.previousConstrictions[constrictionIndex]) {
             update = (A !== undefined && B !== undefined)?
@@ -353,7 +374,7 @@ class Tract {
         }
 
         if(update) {
-            console.log("update");
+            this._updateDiameterRest();
             for(let index = 0; index < this.length; index++) {
                 this.diameter.target[index] = this.diameter.rest[index];
             }
@@ -365,7 +386,7 @@ class Tract {
 
                 if(constriction.index > this.nose.start && constriction.diameter < -this.nose.offset)
                     this.velum.target = 0.4;
-                
+
                 if(constriction.index >= 2 && constriction.index < this.length && constriction.diameter > -(0.85 + this.nose.offset)) {
                     var newTractDiameter = constriction.diameter;
                     newTractDiameter -= 0.3;
@@ -384,20 +405,21 @@ class Tract {
                         const constrictionIndex = Math.round(constriction.index);
                         const constrictionIndexRadius = Math.ceil(tractIndexRange)+1;
 
-                        for(let tractIndex = constrictionIndex - constrictionIndexRadius; (tractIndex < constrictionIndex + constrictionIndexRadius) && (tractIndex >= 0 && tractIndex < this.length); tractIndex++) {
+                        for(let tractIndex = constrictionIndex - constrictionIndexRadius; (tractIndex < constrictionIndex + tractIndexRange+1) && (tractIndex >= 0 && tractIndex < this.length); tractIndex++) {
                             const tractIndexOffset = Math.abs(tractIndex - constriction.index) - 0.5; // relpos
 
                             var tractDiameterScalar; // shrink
                             if(tractIndexOffset <= 0)
                                 tractDiameterScalar = 0;
-                            else if(tractIndexOffset <= tractIndexRange)
-                                tractDiameterScalar = 0.5 * (1 - Math.cos(Math.PI * tractIndexOffset/tractIndexRange));
-                            else
+                            else if(tractIndexOffset > tractIndexRange)
                                 tractDiameterScalar = 1;
+                            else
+                                tractDiameterScalar = 0.5 * (1 - Math.cos(Math.PI * tractIndexOffset/tractIndexRange));
                             
                             const tractDiameterDifference = this.diameter.target[tractIndex] - newTractDiameter;
-                            if(tractDiameterDifference > 0)
-                                this.diameter.target[tractIndex] = newTractDiameter + (tractDiameterDifference * tractDiameterScalar)
+                            if(tractDiameterDifference > 0) {
+                                this.diameter.target[tractIndex] = newTractDiameter + tractDiameterDifference * tractDiameterScalar;
+                            }
                         }
                     }
                 }
@@ -412,21 +434,12 @@ class Tract {
     }
 
     _updateTract() {
-        // reshapeTract
         for(let index = 0; index < this.length; index++) {
             if(this.diameter[index] <= 0) {
                 this.transients.obstruction.new = index;
             }
 
-            var slowReturn;
-                if(index < this.nose.start)
-                    slowReturn = 0.6;
-                else if(index >= this.tip.start)
-                    slowReturn = 1.0;
-                else
-                    slowReturn = 0.6 + (0.4 * (index - this.nose.start));
-            
-            this.diameter[index] = this.diameter.target[index]; // 300
+            this.diameter[index] = this.diameter.target[index];
         }
     }
 
@@ -449,6 +462,7 @@ class Tract {
                     0.999 :
                     (this.amplitude[index-1] - this.amplitude[index]) / (this.amplitude[index-1] + this.amplitude[index]);
             }
+            
         }
 
         const sum = this.amplitude[this.nose.start] + this.amplitude[this.nose.start+1] + this.nose.amplitude[0];

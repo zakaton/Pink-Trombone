@@ -1,13 +1,15 @@
 /*
     TODO
-        fix tract rendering...
+        refactor event => {index:, diameter:, isTongue:,}
 
-        Constrictions Events
+        draw background stuff
 */
 
 class TractUI {
     constructor() {
         this._container = document.createElement("div");
+        this._container.style.margin = 0;
+        this._container.style.padding = 0;
 
         this._canvases = {};
         this._contexts = {};
@@ -17,6 +19,8 @@ class TractUI {
             canvas.id = id;
 
             canvas.style.position = "absolute";
+            canvas.height = 500;
+            canvas.width = 600;
             canvas.style.backgroundColor = "transparent";
             canvas.style.margin = 0;
             canvas.style.padding = 0;
@@ -35,35 +39,17 @@ class TractUI {
             origin : {
                 x : 340,
                 y : 460,
-
-                _x : 340,
-                _y : 460,
-
-                get scale() {
-                    return Math.min(this.x /this._x, this.y/this._y);
-                }
             },
 
             radius : 298,
-            _radius : 298,
-
             scale : 60,
-            _scale : 60,
+
+            scalar : 1,
 
             angle : {
                 scale : 0.64,
                 offset : -0.25,
             },
-
-            resize : () => {
-                this._tract.origin.x = this.width * this._tract.origin._x/600;
-                this._tract.origin.y = this.height * this._tract.origin._y/600;
-
-                const scale = this._tract.origin.scale;
-
-                this._tract.radius = this._tract._radius * scale;
-                this._tract.scale = this._tract._scale * scale;           
-            }
         };
         this._processor = null;
         this._parameters = {};
@@ -111,16 +97,86 @@ class TractUI {
             childList : true,
         });
 
-        // If I want to add the conventional click interface...
-        this._container.addEventListener("mousedown", event => {
+        this._canvases.tract.addEventListener("mousedown", event => {
+            this._mouseDown = true;
 
-        });
-        this._container.addEventListener("mousemove", event => {
+            const position = this._getEventPosition(event);
 
+            var isNearTongue = this._isNearTongue(position.index, position.diameter);
+            
+            if(isNearTongue) {
+                this._setTongue(event, position);
+                this._mouseConstrictionIndex = -1;
+            }
+            else {
+                event.target.dispatchEvent(new CustomEvent("newConstriction", {
+                    bubbles : true,
+                    detail : {
+                        touchIndex : -1, // to distinguish touches and mice
+                        index : position.index,
+                        diameter : position.diameter,
+                    }
+                }));
+            }
         });
-        this._container.addEventListener("mouseup", event => {
+        this._canvases.tract.addEventListener("mousemove", event => {
+            if(this._mouseDown) {
+                const position = this._getEventPosition(event);
+                const isTongue = (this._mouseConstrictionIndex == -1);
+                
+                if(isTongue) {
+                    this._setTongue(event, position);
+                }
+                else {
+                    event.target.dispatchEvent(new CustomEvent("setConstriction", {
+                        bubbles : true,
+                        detail : {
+                            constrictionIndex : this._mouseConstrictionIndex,
+                            index : position.index,
+                            diameter : position.diameter,
+                        }
+                    }))
+                }
+            }
+        });
+        this._canvases.tract.addEventListener("mouseup", event => {
+            if(this._mouseDown) {
+                const isTongue = (this._mouseConstrictionIndex == -1);
+                
+                if(isTongue) {
+                    // nothing
+                }
+                else {
+                    event.target.dispatchEvent(new CustomEvent("removeConstriction", {
+                        bubbles : true,
+                        detail : {
+                            constrictionIndex : this._mouseConstrictionIndex,
+                        }
+                    }));
+                }
+            }
 
+            this._mouseDown = false;
         });
+
+        this._canvases.tract.addEventListener("didNewConstriction", event => {
+            const isMouse = (event.detail.touchIndex == -1);
+            if(isMouse) {
+                this._mouseConstrictionIndex = event.detail.constrictionIndex;
+            }
+            else {
+                // touch stuff...
+            }
+        });
+        this._canvases.tract.addEventListener("didRemoveConstriction", event => {
+            const isMouse = (event.detail.touchIndex == -1);
+            if(isMouse) {
+                this._mouseConstrictionIndex = undefined;
+            }
+            else {
+                // touch stuff
+            }
+        })
     }
 
     get node() {
@@ -135,14 +191,14 @@ class TractUI {
     }
 
     _resize() {
-        this._tract.resize(); // FILL
+        this._tract.scalar = this._canvases.tract.width / this._canvases.tract.offsetWidth;
         this._resizeCanvases();
     }
 
     _resizeCanvases() {
         for(let id in this._canvases) {
-            this._canvases[id].width = this._canvases[id].style.width = this._container.offsetWidth;
-            this._canvases[id].height = this._canvases[id].style.height = this._container.offsetHeight;
+            //this._canvases[id].style.width = this._container.offsetWidth;
+            this._canvases[id].style.height = this._container.offsetHeight;
         }
     }
 
@@ -456,6 +512,56 @@ class TractUI {
         var radius = this._tract.radius - this._tract.scale * diameter;
 
         return radius;
+    }
+
+    _getIndex(x, y) {
+        var angle = Math.atan2(y, x);
+            while(angle > 0) angle -= 2*Math.PI;
+
+        const index = (Math.PI + angle - this._tract.angle.offset) * (this._processor.tract.lip.start - 1) / (this._tract.angle.scale * Math.PI);
+        return index;
+    }
+    _getDiameter(x, y) {
+        const diameter = ((this._tract.radius - Math.sqrt((Math.pow(x, 2) + Math.pow(y, 2)))) / this._tract.scale);
+        return diameter;
+    }
+
+    _isNearTongue(index, diameter) {
+        var isTongue = true;
+        isTongue = isTongue && (this._processor.tract.tongue.range.index.minValue-4 <= index) && (index <= this._processor.tract.tongue.range.index.maxValue+4);
+        isTongue = isTongue && (this._processor.tract.tongue.range.diameter.minValue-0.5 <= diameter) && (diameter <= this._processor.tract.tongue.range.diameter.maxValue+0.5);
+        return isTongue;
+    }
+
+    _getEventX(event) {
+        const x = (event.offsetX * this._tract.scalar) - this._tract.origin.x;
+        return x;
+    }
+    _getEventY(event) {
+        const y = (event.offsetY * this._tract.scalar) - this._tract.origin.y;
+        return y;
+    }
+
+    _getEventPosition(event) {
+        const x = this._getEventX(event);
+        const y = this._getEventY(event);
+
+        return {
+            index : this._getIndex(x, y),
+            diameter : this._getDiameter(x, y),
+        };
+    }
+
+    _setTongue(event, position) {
+        Object.keys(position).forEach(parameterNameSuffix => {
+            event.target.dispatchEvent(new CustomEvent("setParameter", {
+                bubbles : true,
+                detail : {
+                    parameterName : "tongue." + parameterNameSuffix,
+                    newValue : position[parameterNameSuffix],
+                }
+            }));    
+        });
     }
 }
 

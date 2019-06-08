@@ -59,7 +59,7 @@ const ParameterDescriptors = [
     },
 ];
 
-ParameterDescriptors.numberOfConstrictions = 3;
+ParameterDescriptors.numberOfConstrictions = 4;
 
 for(let index = 0; index < ParameterDescriptors.numberOfConstrictions; index++) {
     const constrictionParameterDescriptors = [

@@ -1,6 +1,6 @@
 /*
     TODO            
-        rearrange parameters
+        add "precision" property to iterate this.tract.process
 */
 
 import Glottis from "./Glottis.js";
@@ -12,15 +12,15 @@ class Processor {
         this.tract = new Tract();
     }
 
-    process(parameterSamples, sampleIndex, bufferLength, seconds, constrictions) {
+    process(parameterSamples, sampleIndex, bufferLength, seconds) {
         var outputSample = 0;
         
         const glottisSample = this.glottis.process(...arguments);
         parameterSamples.glottis = glottisSample;
 
         outputSample += this.tract.process(...arguments);
-            sampleIndex = 0.5; // process twice - note the "...arguments" doesn't read this
-        outputSample += this.tract.process(parameterSamples, sampleIndex, bufferLength, seconds, constrictions);
+            sampleIndex += 0.5; // process twice - note the "...arguments" doesn't read this
+        outputSample += this.tract.process(parameterSamples, sampleIndex, bufferLength, seconds);
 
         outputSample *= 0.125;
         return outputSample;

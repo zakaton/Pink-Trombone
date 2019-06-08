@@ -86,7 +86,7 @@ class PinkTromboneWorkletProcessor extends AudioWorkletProcessor {
                     const parameterSamples = this._getParameterSamples(parameters, sampleIndex);
                     const seconds = currentTime + (sampleIndex/sampleRate);
                                         
-                    outputs[outputIndex][channelIndex][sampleIndex] = this.processor.process(parameterSamples, sampleIndex, outputs[outputIndex][channelIndex].length, seconds, constrictions);
+                    outputs[outputIndex][channelIndex][sampleIndex] = this.processor.process(parameterSamples, sampleIndex, outputs[outputIndex][channelIndex].length, seconds);
                 }
 
         this.processor.update(currentTime + (outputs[0][0].length/sampleRate), constrictions);

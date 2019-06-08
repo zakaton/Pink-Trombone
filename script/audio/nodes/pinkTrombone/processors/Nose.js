@@ -9,7 +9,6 @@ class Nose {
 
         this.start = tract.length - this.length + 1;
 
-        this.output = 0;
         this.fade = 1;
         this.offset = 0.8;
 
@@ -34,10 +33,9 @@ class Nose {
             
             this.diameter[index] = Math.min(value, 1.9);
         }
+    }
 
-        this.diameter[0] = tract.velum.target;
-
-        // nose.update
+    update() {
         for(let index = 0; index < this.length; index++) {
             this.amplitude[index] = Math.pow(this.diameter[index], 2);
 
