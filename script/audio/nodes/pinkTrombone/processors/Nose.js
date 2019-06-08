@@ -33,15 +33,15 @@ class Nose {
             
             this.diameter[index] = Math.min(value, 1.9);
         }
-    }
 
-    update() {
         for(let index = 0; index < this.length; index++) {
             this.amplitude[index] = Math.pow(this.diameter[index], 2);
-
+            
             if(index > 0)
                 this.reflection[index] = (this.amplitude[index-1] - this.amplitude[index]) / (this.amplitude[index-1] + this.amplitude[index]);
         }
+
+        this.diameter[0] = tract.velum.target;
     }
 }
 

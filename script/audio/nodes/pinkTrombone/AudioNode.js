@@ -1,6 +1,6 @@
 /*
     TODO
-        *
+        Constriction Issue with ScriptProcessorNode
 */
 
 import ParameterDescriptors from "./processors/workletProcessors/ParameterDescriptors.js";
@@ -151,7 +151,7 @@ if(window.AudioWorklet !== undefined) {
 }
 else {
     window.AudioContext.prototype.createPinkTromboneNode = function() {
-        const pinkTromboneNode = this.createScriptProcessor(Math.pow(2, 9), ParameterDescriptors.length, 1);
+        const pinkTromboneNode = this.createScriptProcessor(Math.pow(2, 10), ParameterDescriptors.length, 1);
         pinkTromboneNode.processor = new Processor();
 
         setupNode(pinkTromboneNode);

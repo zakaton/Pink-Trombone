@@ -71,7 +71,6 @@ class Tract {
         
         this.diameter = new Float64Array(this.length);
             this.diameter.rest = new Float64Array(this.length);
-            this.diameter.target = new Float64Array(this.length);
 
 
         // Tongue & Nose
@@ -134,6 +133,9 @@ class Tract {
             },
         };
 
+        // NOSE
+        this.nose = new Nose(this);
+
         // Transients
         this.transients = [];
             this.transients.obstruction = {
@@ -144,9 +146,6 @@ class Tract {
         // Constrictions
         this.previousConstrictions = [];
             this.previousConstrictions.tongue = {};
-
-        // NOSE
-        this.nose = new Nose(this);
 
         // diameter.update
         for(let index = 0; index < this.length; index++) {
@@ -161,20 +160,10 @@ class Tract {
 
             this.diameter[index] = value;
             this.diameter.rest[index] = value;
-            this.diameter.target[index] = value;
-        }
-
-        this._updateDiameterRest();
-        
-        for(let index = 0; index < this.length; index++) {
-            this.diameter[index] = this.diameter.rest[index];
-            this.diameter.target[index] = this.diameter.rest[index];
         }
 
         this._updateReflection();
 
-        this.nose.update();
-        this.nose.diameter[0] = this.velum.target;
     }
 
     // PROCESS
@@ -188,7 +177,9 @@ class Tract {
         const bufferInterpolation = (sampleIndex/bufferLength);
         const updateAmplitudes = (Math.random() < 0.1);
 
-        const outputSample = this._processLips(parameterSamples, bufferInterpolation, updateAmplitudes)// + this._processNose(parameterSamples, bufferInterpolation, updateAmplitudes);
+        var outputSample = 0;
+            outputSample += this._processLips(parameterSamples, bufferInterpolation, updateAmplitudes);
+            outputSample += this._processNose(parameterSamples, bufferInterpolation, updateAmplitudes);
         return outputSample;
     }
 
@@ -267,45 +258,13 @@ class Tract {
             }
         }
 
-        const tractOutput = this.right[this.length-1];
-
-        // NOSE
-        this.nose.left.junction[this.nose.length] = this.nose.right[this.nose.length-1] * this.lip.reflection;
-
-        if(true)
-        for(let index = 1; index < this.nose.length; index++) {
-            const offset = this.nose.reflection[index] * (this.nose.left[index] * this.nose.right[index-1]);
-
-            this.nose.left.junction[index] = this.nose.left[index] + offset;
-            this.nose.right.junction[index] = this.nose.right[index-1] - offset;
-        }
-
-        if(true)
-        for(let index = 0; index < this.nose.length; index++) {
-            this.nose.left[index] = this.nose.left.junction[index+1] * this.nose.fade;
-            this.nose.right[index] = this.nose.right.junction[index] * this.nose.fade;
-
-            if(updateAmplitudes) {
-                const sum = Math.abs(this.nose.left[index] + this.nose.right[index]);
-                this.nose.amplitude.max[index] = (sum > this.nose.amplitude.max[index])?
-                    sum :
-                    this.nose.amplitude.max[index] * 0.999;
-            }
-        }
-
-        var noseOutput = this.nose.right[this.nose.length-1];
-        
-        return tractOutput + noseOutput;
-        //return this.right[this.length-1];
+        return this.right[this.length-1];;
     }
     _processNose(parameterSamples, bufferInterpolation, updateAmplitudes) {
         this.nose.left.junction[this.nose.length] = this.nose.right[this.nose.length-1] * this.lip.reflection;
 
-        const noseInterpolation = Math.interpolate(bufferInterpolation, this.nose.reflection.new, this.nose.reflection.value);
-            this.nose.right.junction[0] = noseInterpolation * this.nose.left[0] + (noseInterpolation + 1) * (this.left[this.nose.start] + this.right[this.nose.start-1]);
-
         for(let index = 1; index < this.nose.length; index++) {
-            const offset = this.nose.reflection[index] * (this.nose.left[index] * this.nose.right[index-1]);
+            const offset = this.nose.reflection[index] * (this.nose.left[index] + this.nose.right[index-1]);
 
             this.nose.left.junction[index] = this.nose.left[index] + offset;
             this.nose.right.junction[index] = this.nose.right[index-1] - offset;
@@ -376,7 +335,7 @@ class Tract {
         if(update) {
             this._updateDiameterRest();
             for(let index = 0; index < this.length; index++) {
-                this.diameter.target[index] = this.diameter.rest[index];
+                this.diameter[index] = this.diameter.rest[index];
             }
 
             this.velum.target = 0.01;
@@ -416,9 +375,9 @@ class Tract {
                             else
                                 tractDiameterScalar = 0.5 * (1 - Math.cos(Math.PI * tractIndexOffset/tractIndexRange));
                             
-                            const tractDiameterDifference = this.diameter.target[tractIndex] - newTractDiameter;
+                            const tractDiameterDifference = this.diameter[tractIndex] - newTractDiameter;
                             if(tractDiameterDifference > 0) {
-                                this.diameter.target[tractIndex] = newTractDiameter + tractDiameterDifference * tractDiameterScalar;
+                                this.diameter[tractIndex] = newTractDiameter + tractDiameterDifference * tractDiameterScalar;
                             }
                         }
                     }
@@ -438,8 +397,6 @@ class Tract {
             if(this.diameter[index] <= 0) {
                 this.transients.obstruction.new = index;
             }
-
-            this.diameter[index] = this.diameter.target[index];
         }
     }
 
