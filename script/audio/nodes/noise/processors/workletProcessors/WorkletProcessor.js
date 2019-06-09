@@ -1,6 +1,5 @@
 /*
     TODO
-        Get the buffer to work...
         Parameterize this.buffer.length
         Parameterize whether its fixed or dynamic
         Parameterize Random generator (white, pink, brown...)

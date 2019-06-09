@@ -1,7 +1,6 @@
 /*
     TODO
-        simplify the tenseness (as an interpolation between noise and voice)
-        normalizedWaveform & noiseModulator getter|setter
+        *
 */
 
 Math.clamp = function(value, min, max) {
@@ -80,7 +79,6 @@ class Glottis {
 
         var noise = parameterSamples.noise;
             noise *= noiseModulator;
-            noise *= tenseness;
             noise *= intensity;
             noise *= intensity;
             noise *= (1 - Math.sqrt(Math.max(tenseness, 0)));

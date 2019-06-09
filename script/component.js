@@ -30,9 +30,15 @@ class PinkTromboneElement extends HTMLElement {
 
                         event.stopPropagation();
                     });
+
+                    this.addEventListener("resume", event => {
+                        this.audioContext.resume();
+                        event.target.dispatchEvent(new CustomEvent("didResume"));
+                    });
         
                     // Audio Parameters
                     this.addEventListener("setParameter", event => {
+
                         const parameterName = event.detail.parameterName;
                         const audioParam = parameterName.split('.').reduce((audioParam, propertyName) => audioParam[propertyName], this.parameters);
                         const newValue = Number(event.detail.newValue);

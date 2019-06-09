@@ -1,7 +1,9 @@
 /*
     TODO
+        mouseY
+        touch
+        set actual frequency range
         mousedown turns on voice/loudness and VV
-        refactor
 */
 
 Math.clamp = function(value, min = 0, max = 1) {
@@ -55,10 +57,14 @@ class GlottisUI {
                     horizontal : Math.clamp((event.pageX - this._container.offsetLeft)/this._container.offsetWidth, 0, 0.99),
                 };
 
+                const frequency = this._frequency.interpolate(interpolation.horizontal);
+                const tenseness = 1 - Math.cos((1 - interpolation.vertical) * Math.PI * 0.5);
+                const loudness = Math.pow(tenseness, 0.25);
+
                 const parameters = {
-                    frequency : this._frequency.interpolate(interpolation.horizontal),
-                    tenseness : 1-interpolation.vertical,
-                    loudness : (1-(interpolation.vertical*0.8)),
+                    frequency : frequency,
+                    tenseness : tenseness,
+                    loudness : loudness,
                 };
                 
                 // add a delay for a rise and fall for voice?

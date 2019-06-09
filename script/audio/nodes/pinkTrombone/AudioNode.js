@@ -1,6 +1,6 @@
 /*
     TODO
-        Constriction Issue with ScriptProcessorNode
+        *
 */
 
 import ParameterDescriptors from "./processors/workletProcessors/ParameterDescriptors.js";
@@ -83,7 +83,7 @@ function assignAudioParam(audioNode, audioParam, paramName) {
     }
 }
 
-if(window.AudioWorklet !== undefined) {
+if(false && window.AudioWorklet !== undefined) {
     class PinkTromboneNode extends AudioWorkletNode {
         constructor(audioContext) {
             super(audioContext, "pink-trombone-worklet-processor");
@@ -151,7 +151,7 @@ if(window.AudioWorklet !== undefined) {
 }
 else {
     window.AudioContext.prototype.createPinkTromboneNode = function() {
-        const pinkTromboneNode = this.createScriptProcessor(Math.pow(2, 10), ParameterDescriptors.length, 1);
+        const pinkTromboneNode = this.createScriptProcessor(Math.pow(2, 11), ParameterDescriptors.length, 1);
         pinkTromboneNode.processor = new Processor();
 
         setupNode(pinkTromboneNode);
@@ -168,7 +168,7 @@ else {
                 audioParam.automationRate = parameterDescriptor.automationRate || "a-rate";
                 audioParam.value = parameterDescriptor.defaultValue || 0;
             constantSource.connect(pinkTromboneNode.channelMerger, 0, index);
-            
+
             pinkTromboneNode.channelMerger.channels[index] = parameterDescriptor.name;
 
             assignAudioParam(pinkTromboneNode, audioParam, parameterDescriptor.name);
@@ -238,7 +238,7 @@ else {
         pinkTromboneNode._enableConstriction = function(constrictionIndex) {
             this._constrictions[constrictionIndex]._isEnabled = true;
         }
-        pinkTromboneNode._disableConstriction = function() {
+        pinkTromboneNode._disableConstriction = function(constrictionIndex) {
             this._constrictions[constrictionIndex]._isEnabled = false;
         }
 

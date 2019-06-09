@@ -1,6 +1,6 @@
 /*
     TODO
-        *
+        start/stop for the pinkTromboneNode
 */
 
 import {} from "./audio/nodes/noise/AudioNode.js";
@@ -53,6 +53,9 @@ class PinkTrombone {
 
         this._noise.connect(this._fricativeFilter);
             this._fricativeFilter.connect(this._pinkTromboneNode.noise);
+
+        this._gain = this.audioContext.createGain();
+            this._pinkTromboneNode.connect(this._gain);
     }
 
     get parameters() {
@@ -60,10 +63,10 @@ class PinkTrombone {
     }
 
     connect() {
-        return this._pinkTromboneNode.connect(...arguments);
+        return this._gain.connect(...arguments);
     }
     disconnect() {
-        return this._pinkTromboneNode.disconnect(...arguments);
+        return this._gain.disconnect(...arguments);
     }
 
     start() {

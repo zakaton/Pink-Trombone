@@ -41,7 +41,9 @@ else {
     window.AudioContext.prototype.createNoise = function() {
         const noiseNode = this.createBufferSource();
 
-        const buffer = this.createBuffer(1, Math.pow(2, 12), this.sampleRate);
+        const seconds = 1;
+
+        const buffer = this.createBuffer(1, seconds*this.sampleRate, this.sampleRate);
         const bufferChannel = buffer.getChannelData(0);
         for(let sampleIndex = 0; sampleIndex < bufferChannel.length; sampleIndex++)
             bufferChannel[sampleIndex] = ((Math.random(0) *2) -1);
