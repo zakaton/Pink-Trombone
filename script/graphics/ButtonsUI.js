@@ -1,6 +1,7 @@
 /*
     TODO
         Toggle phonemes (voice/voiceless/none)
+        refactor button creation
 */
 
 class ButtonsUI {
@@ -52,19 +53,23 @@ class ButtonsUI {
                         "enable";
                     button.innerText = prefix + ' ' + button.id;
                     
-                    const customEvent = new CustomEvent("setParameter", {
+                    button.dispatchEvent(new CustomEvent("setParameter", {
                         bubbles : true,
                         detail : {
                             parameterName : parameterPath || buttonName,
                             newValue : (button.value == "true")? 1:0,
                         }
-                    });
-                    button.dispatchEvent(customEvent);
-                });
+                    }));
 
-                button.addEventListener("didSetParameter", event => {
-                    // like a promise...
-                });    
+                    button.dispatchEvent(new CustomEvent("message", {
+                        bubbles : true,
+                        detail : {
+                            type : "toggleButton",
+                            parameterName : buttonName,
+                            newValue : button.value,
+                        }
+                    }));
+                });
             }
         return button;
     }

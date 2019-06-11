@@ -1,7 +1,6 @@
 /*
     TODO
-        refactor event => {index:, diameter:, isTongue:,}
-
+        throttle value setter
         draw background stuff
 */
 
@@ -54,19 +53,20 @@ class TractUI {
         this._processor = null;
         this._parameters = {};
 
-        this._container.addEventListener("animationFrame", event => {            
-            const customEvent = new CustomEvent("getProcessor", {
-                bubbles : true,
-            });
-            this._container.dispatchEvent(customEvent);
+        this._touchConstrictionIndices = [];
 
-            const getParameterCustomEvent = new CustomEvent("getParameter", {
+        // AnimationFrame
+        this._container.addEventListener("animationFrame", event => {            
+            this._container.dispatchEvent(new CustomEvent("getProcessor", {
+                bubbles : true,
+            }));
+
+            this._container.dispatchEvent(new CustomEvent("getParameter", {
                 bubbles : true,
                 detail : {
                     parameterName : "intensity",
                 },
-            });
-            this._container.dispatchEvent(getParameterCustomEvent);
+            }));
         });
 
         this._container.addEventListener("didGetProcessor", event => {
@@ -81,13 +81,12 @@ class TractUI {
             this._parameters[parameterName] = value;
         });
 
+        // RequestAnimationFrame after being attached to the DOM
         const mutationObserver = new MutationObserver((mutationsList, observer) => {
             if(document.contains(this._container)) {
-
-                const customEvent = new CustomEvent("requestAnimationFrame", {
+                this._container.dispatchEvent(new CustomEvent("requestAnimationFrame", {
                     bubbles : true,
-                });
-                this._container.dispatchEvent(customEvent);
+                }));
 
                 observer.disconnect();
             }
@@ -97,86 +96,42 @@ class TractUI {
             childList : true,
         });
 
+        // Mouse EventListeners
         this._canvases.tract.addEventListener("mousedown", event => {
-            this._mouseDown = true;
-
-            const position = this._getEventPosition(event);
-
-            var isNearTongue = this._isNearTongue(position.index, position.diameter);
-            
-            if(isNearTongue) {
-                this._setTongue(event, position);
-                this._mouseConstrictionIndex = -1;
-            }
-            else {
-                event.target.dispatchEvent(new CustomEvent("newConstriction", {
-                    bubbles : true,
-                    detail : {
-                        touchIndex : -1, // to distinguish touches and mice
-                        index : position.index,
-                        diameter : position.diameter,
-                    }
-                }));
-            }
+            this._startEvent(event);
         });
         this._canvases.tract.addEventListener("mousemove", event => {
-            if(this._mouseDown) {
-                const position = this._getEventPosition(event);
-                const isTongue = (this._mouseConstrictionIndex == -1);
-                
-                if(isTongue) {
-                    this._setTongue(event, position);
-                }
-                else {
-                    event.target.dispatchEvent(new CustomEvent("setConstriction", {
-                        bubbles : true,
-                        detail : {
-                            constrictionIndex : this._mouseConstrictionIndex,
-                            index : position.index,
-                            diameter : position.diameter,
-                        }
-                    }))
-                }
-            }
+            this._moveEvent(event);
         });
         this._canvases.tract.addEventListener("mouseup", event => {
-            if(this._mouseDown) {
-                const isTongue = (this._mouseConstrictionIndex == -1);
-                
-                if(isTongue) {
-                    // nothing
-                }
-                else {
-                    event.target.dispatchEvent(new CustomEvent("removeConstriction", {
-                        bubbles : true,
-                        detail : {
-                            constrictionIndex : this._mouseConstrictionIndex,
-                        }
-                    }));
-                }
-            }
-
-            this._mouseDown = false;
+            this._endEvent(event);
         });
 
+        // Touch EventListeners
+        this._canvases.tract.addEventListener("touchstart", event => {
+            event.preventDefault();
+            Array.from(event.changedTouches).forEach(touch => this._startEvent(touch));
+        });
+        this._canvases.tract.addEventListener("touchmove", event => {
+            event.preventDefault();
+            Array.from(event.changedTouches).forEach(touch => this._moveEvent(touch));
+        });
+        this._canvases.tract.addEventListener("touchend", event => {
+            event.preventDefault();
+            Array.from(event.changedTouches).forEach(touch => this._endEvent(touch));
+        });
+        this._canvases.tract.addEventListener("touchcancel", event => {
+            event.preventDefault();
+            Array.from(event.changedTouches).forEach(touch => this._endEvent(touch));
+        })
+
+        // Constriction EventLiteners
         this._canvases.tract.addEventListener("didNewConstriction", event => {
-            const isMouse = (event.detail.touchIndex == -1);
-            if(isMouse) {
-                this._mouseConstrictionIndex = event.detail.constrictionIndex;
-            }
-            else {
-                // touch stuff...
-            }
+            this._touchConstrictionIndices[event.detail.touchIdentifier] = event.detail.constrictionIndex;
         });
         this._canvases.tract.addEventListener("didRemoveConstriction", event => {
-            const isMouse = (event.detail.touchIndex == -1);
-            if(isMouse) {
-                this._mouseConstrictionIndex = undefined;
-            }
-            else {
-                // touch stuff
-            }
-        })
+            this._touchConstrictionIndices[event.detail.touchIdentifier] = undefined;
+        });
     }
 
     get node() {
@@ -492,13 +447,14 @@ class TractUI {
             this._context.lineTo(x, y);
     }
 
+
     _getX(angle, radius) {
         return this._tract.origin.x - radius * Math.cos(angle)
     }
     _getY(angle, radius) {
         return this._tract.origin.y - radius * Math.sin(angle)
     }
-
+    
     _getAngle(index) {
         const angle = this._tract.angle.offset + index * this._tract.angle.scale * Math.PI / (this._processor.tract.lip.start - 1);
         return angle;
@@ -534,11 +490,11 @@ class TractUI {
     }
 
     _getEventX(event) {
-        const x = (event.offsetX * this._tract.scalar) - this._tract.origin.x;
+        const x = ((event.pageX - event.target.offsetLeft) * this._tract.scalar) - this._tract.origin.x;
         return x;
     }
     _getEventY(event) {
-        const y = (event.offsetY * this._tract.scalar) - this._tract.origin.y;
+        const y = ((event.pageY - event.target.offsetTop) * this._tract.scalar) - this._tract.origin.y;
         return y;
     }
 
@@ -562,6 +518,81 @@ class TractUI {
                 }
             }));    
         });
+    }
+
+    _startEvent(event) {
+        const touchIdentifier = (event instanceof Touch)?
+            event.identifier :
+            -1;
+
+        if(this._touchConstrictionIndices[touchIdentifier] == undefined) {
+            const position = this._getEventPosition(event);
+            const isNearTongue = this._isNearTongue(position.index, position.diameter);
+            if(isNearTongue) {
+                this._touchConstrictionIndices[touchIdentifier] = -1;
+                this._setTongue(event, position);
+            }
+            else {
+                event.target.dispatchEvent(new CustomEvent("newConstriction", {
+                    bubbles : true,
+                    detail : {
+                        touchIdentifier : touchIdentifier,
+                        index : position.index,
+                        diameter : position.diameter,
+                    }
+                }));
+            }
+        }
+    }
+    _moveEvent(event) {
+        const touchIdentifier = (event instanceof Touch)?
+            event.identifier :
+            -1;
+
+        if(this._touchConstrictionIndices[touchIdentifier] !== undefined) {
+            const position = this._getEventPosition(event);
+            const constrictionIndex = this._touchConstrictionIndices[touchIdentifier];
+            const isTongue = (constrictionIndex == -1);
+
+            if(isTongue) {
+                this._setTongue(event, position);
+            }
+            else {
+                event.target.dispatchEvent(new CustomEvent("setConstriction", {
+                    bubbles : true,
+                    detail : {
+                        constrictionIndex : constrictionIndex,
+                        index : position.index,
+                        diameter : position.diameter,
+                    }
+                }));
+            }
+        }
+    }
+    _endEvent(event) {
+        const touchIdentifier = (event instanceof Touch)?
+            event.identifier :
+            -1;
+        
+        if(this._touchConstrictionIndices[touchIdentifier] !== undefined) {
+            const constrictionIndex = this._touchConstrictionIndices[touchIdentifier];
+            const isTongue = (constrictionIndex == -1);
+
+            if(isTongue) {
+                // do nothing
+            }
+            else {
+                event.target.dispatchEvent(new CustomEvent("removeConstriction", {
+                    bubbles : true,
+                    detail : {
+                        constrictionIndex : constrictionIndex,
+                        touchIdentifier : touchIdentifier,
+                    }
+                }));
+            }
+
+            this._touchConstrictionIndices[touchIdentifier] = undefined;
+        }
     }
 }
 

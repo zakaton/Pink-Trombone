@@ -1,7 +1,6 @@
 /*
     TODO
-        refactor UI (enableUI or whatever)
-        setParameter valueRamp (framerate?)
+        *
 */
 
 import {} from "./PinkTrombone.js";
@@ -12,158 +11,181 @@ window.AudioContext = window.AudioContext || window.webkitAudioContext;
 class PinkTromboneElement extends HTMLElement {
     constructor() {
         super();
+
         this._animationFrameObservers = [];
 
         window.customElements.whenDefined("pink-trombone")
             .then(() => {
-                if(true) { // UI eventListeners
-                    this.UI = new PinkTromboneUI();
-                    this.appendChild(this.UI.node);
+                // RequestAnimationFrame
+                this.addEventListener("requestAnimationFrame", event => {
+                    if(!this._animationFrameObservers.includes(event.target))
+                        this._animationFrameObservers.push(event.target);
 
-                    // RequestAnimationFrame
-                    this.addEventListener("requestAnimationFrame", event => {
-                        if(!this._animationFrameObservers.includes(event.target))
-                            this._animationFrameObservers.push(event.target);
+                    const customEvent = new CustomEvent("didRequestAnimationFrame");
+                    event.target.dispatchEvent(customEvent);
 
-                        const customEvent = new CustomEvent("didRequestAnimationFrame");
-                        event.target.dispatchEvent(customEvent);
+                    event.stopPropagation();
+                });
 
-                        event.stopPropagation();
-                    });
+                this.addEventListener("resume", event => {
+                    this.audioContext.resume();
+                    event.target.dispatchEvent(new CustomEvent("didResume"));
+                });
+    
+                // Audio Parameters
+                this.addEventListener("setParameter", event => {
 
-                    this.addEventListener("resume", event => {
-                        this.audioContext.resume();
-                        event.target.dispatchEvent(new CustomEvent("didResume"));
-                    });
-        
-                    // Audio Parameters
-                    this.addEventListener("setParameter", event => {
+                    const parameterName = event.detail.parameterName;
+                    const audioParam = parameterName.split('.').reduce((audioParam, propertyName) => audioParam[propertyName], this.parameters);
+                    const newValue = Number(event.detail.newValue);
 
-                        const parameterName = event.detail.parameterName;
-                        const audioParam = parameterName.split('.').reduce((audioParam, propertyName) => audioParam[propertyName], this.parameters);
-                        const newValue = Number(event.detail.newValue);
+                    switch(event.detail.type) {
+                        case "linear":
+                            audioParam.linearRampToValueAtTime(newValue, this.audioContext.currentTime + event.detail.timeOffset);
+                            break;
+                        default:
+                            audioParam.value = newValue;
+                    }
 
-                        // can add more details like the delay and stuff
-                        audioParam.value = newValue;
+                    event.target.dispatchEvent(new CustomEvent("didSetParameter", {
+                        detail : event.detail,
+                    }));
 
-                        const customEvent = new CustomEvent("didSetParameter", {
-                            detail : event.detail,
-                        });
-                        event.target.dispatchEvent(customEvent);
+                    event.stopPropagation();
+                });
 
-                        event.stopPropagation();
-                    });
+                this.addEventListener("getParameter", event => {
+                    const parameterName = event.detail.parameterName;
+                    const audioParam = parameterName.split('.').reduce((audioParam, propertyName) => audioParam[propertyName], this.parameters);
 
-                    this.addEventListener("getParameter", event => {
-                        const parameterName = event.detail.parameterName;
-                        const audioParam = parameterName.split('.').reduce((audioParam, propertyName) => audioParam[propertyName], this.parameters);
+                    const value = audioParam.value;
+                    
+                    const detail = event.detail;
+                        detail.value = value;
 
-                        const value = audioParam.value;
+                    event.target.dispatchEvent(new CustomEvent("didGetParameter", {
+                        detail : detail,
+                    }));
 
-                        const customEvent = new CustomEvent("didGetParameter", {
-                            detail : {
-                                parameterName : parameterName,
-                                value : value,
-                            },
-                        });
-                        event.target.dispatchEvent(customEvent);
+                    event.stopPropagation();
+                });
 
-                        event.stopPropagation();
-                    });
+                // Constrictions
+                this.addEventListener("newConstriction", event => {
+                    const {index, diameter} = event.detail;
+                    const constriction = this.newConstriction(index, diameter);
 
-                    // Constrictions
-                    this.addEventListener("newConstriction", event => {
+                    const detail = event.detail;
+                    detail.constrictionIndex = constriction._index;
+
+                    event.target.dispatchEvent(new CustomEvent("didNewConstriction", {
+                        detail : detail,
+                    }));
+
+                    event.stopPropagation();
+                });
+                this.addEventListener("setConstriction", event => {
+                    const constrictionIndex = Number(event.detail.constrictionIndex);
+                    const constriction = this.constrictions[constrictionIndex];
+
+                    if(constriction) {
                         const {index, diameter} = event.detail;
-                        const constriction = this.newConstriction(index, diameter);
 
-                        const detail = event.detail;
-                        detail.constrictionIndex = constriction._index;
+                        const indexValue = index || constriction.index.value;
+                        const diameterValue = diameter || constriction.diameter.value;
 
-                        const customEvent = new CustomEvent("didNewConstriction", {
-                            detail : detail,
-                        });
-
-                        event.target.dispatchEvent(customEvent);
-
-                        event.stopPropagation();
-                    });
-                    this.addEventListener("setConstriction", event => {
-                        const constrictionIndex = Number(event.detail.constrictionIndex);
-                        const constriction = this.constrictions[constrictionIndex];
-
-                        if(constriction) {
-                            const {index, diameter} = event.detail;
-
-                            if(index !== undefined)
-                                constriction.index.value = index;
-
-                            if(diameter !== undefined)
-                                constriction.diameter.value = diameter;
-                            
-                            const customEvent = new CustomEvent("didSetConstriction");
-                            event.target.dispatchEvent(customEvent);
+                        switch(event.detail.type) {
+                            case "linear":
+                                constriction.index.linearRampToValueAtTime(indexValue, event.detail.endTime);
+                                constriction.diameter.linearRampToValueAtTime(diameterValue, event.detail.endTime);
+                                break;
+                            default:
+                                constriction.index.value = indexValue;
+                                constriction.diameter.value = diameterValue;
                         }
                         
-                        event.stopPropagation();
-                    });
-                    this.addEventListener("getConstriction", event => {
-                        const constrictionIndex = Number(event.detail.constrictionIndex);
-                        const constriction = this.constrictions[constrictionIndex];
-                        
-                        const customEvent = new CustomEvent("didGetConstriction", {
-                            detail : {
-                                index : constriction.index.value,
-                                diameter : constriction.diameter.value,
-                            },
+                        event.target.dispatchEvent(new CustomEvent("didSetConstriction"));
+                    }
+                    
+                    event.stopPropagation();
+                });
+                this.addEventListener("getConstriction", event => {
+                    const constrictionIndex = Number(event.detail.constrictionIndex);
+                    const constriction = this.constrictions[constrictionIndex];
+    
+                    event.target.dispatchEvent(new CustomEvent("didGetConstriction", {
+                        detail : {
+                            index : constriction.index.value,
+                            diameter : constriction.diameter.value,
+                        },
+                    }));
+
+                    event.stopPropagation();
+                });
+                this.addEventListener("removeConstriction", event => {
+                    const constrictionIndex = Number(event.detail.constrictionIndex);
+                    const constriction = this.constrictions[constrictionIndex];
+                    this.removeConstriction(constriction);
+
+                    const detail = event.detail;
+                    
+                    event.target.dispatchEvent(new CustomEvent("didRemoveConstriction", {
+                        detail : detail,
+                    }));
+
+                    event.stopPropagation();
+                });
+
+                this.addEventListener("getProcessor", event => {
+                    this.getProcessor()
+                        .then(processor => {
+                            event.target.dispatchEvent(new CustomEvent("didGetProcessor", {
+                                detail : {
+                                    processor : processor,
+                                }
+                            }));        
                         });
-                        event.target.dispatchEvent(customEvent);
 
-                        event.stopPropagation();
-                    });
-                    this.addEventListener("removeConstriction", event => {
-                        const constrictionIndex = Number(event.detail.constrictionIndex);
-                        const constriction = this.constrictions[constrictionIndex];
-                        this.removeConstriction(constriction);
-
-                        const detail = event.detail;
-                        
-                        const customEvent = new CustomEvent("didRemoveConstriction", {
-                            detail : detail,
-                        });
-                        event.target.dispatchEvent(customEvent);
-
-                        event.stopPropagation();
-                    });
-
-                    this.addEventListener("getProcessor", event => {
-                        this.getProcessor()
-                            .then(processor => {
-                                const customEvent = new CustomEvent("didGetProcessor", {
-                                    detail : {
-                                        processor : processor,
-                                    }
-                                });
-                                event.target.dispatchEvent(customEvent);        
-                            });
-
-                        event.stopPropagation();
-                    });
-                }
+                    event.stopPropagation();
+                });
             });
+        
+        if(this.getAttribute("UI") !== null)
+            this.enableUI();
         
         const loadEvent = new Event("load");
         this.dispatchEvent(loadEvent);
     }
 
+    enableUI() {
+        if(this.UI == undefined) {
+            this.UI = new PinkTromboneUI();
+            this.appendChild(this.UI.node);
+        }
+
+        this.UI.show();
+    }
+    disableUI() {
+        if(this.UI !== undefined) {
+            this.UI.hide();
+        }
+    }
+
+    // getAttribute getter?
     static get observedAttributes() {
         return [
-
+            "UI",
         ];
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
         switch(name) {
-
+            case "UI":
+                if(newValue !== null)
+                    this.enableUI();
+                else
+                    this.disableUI();
+                break;
             default:
                 break;
         }
@@ -204,7 +226,7 @@ class PinkTromboneElement extends HTMLElement {
         if(this.pinkTrombone) {
             this.isRunning = true;
             
-            if(true) { // is UI
+            if(this.UI !== undefined) {
                 window.requestAnimationFrame(highResTimeStamp => {
                     this._requestAnimationFrameCallback(highResTimeStamp);
                 });
@@ -238,6 +260,8 @@ class PinkTromboneElement extends HTMLElement {
         }
     }
 
+
+    // CONSTRICTIONS
     get constrictions() {
         return this.pinkTrombone.constrictions;
     }

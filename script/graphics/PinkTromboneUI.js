@@ -37,10 +37,28 @@ class PinkTromboneUI {
                 this._buttonsUI.node.style.zIndex = 1;
                 this._buttonsUI.node.style.gridColumn = "2";
                 this._buttonsUI.node.style.gridRow = "2";
+            
+            this._container.addEventListener("message", event => {
+                event.stopPropagation();
+                Array.from(this._container.children).forEach(child => {
+                    if(child !== event.target) {
+                        child.dispatchEvent(new CustomEvent("message", {
+                            detail : event.detail,
+                        }));
+                    }
+                });
+            });
     }
 
     get node() {
         return this._container;
+    }
+
+    show() {
+        this.node.style.display = "grid";
+    }
+    hide() {
+        this.node.style.display = "none";
     }
 }
 
