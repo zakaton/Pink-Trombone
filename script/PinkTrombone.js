@@ -3,6 +3,7 @@
         start/stop for the pinkTromboneNode
 */
 
+import {} from "./audio/nodes/constantSource/AudioNode.js"
 import {} from "./audio/nodes/noise/AudioNode.js";
 import {} from "./audio/nodes/pinkTrombone/AudioNode.js";
 

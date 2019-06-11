@@ -5,7 +5,6 @@
 
 import ParameterDescriptors from "./processors/workletProcessors/ParameterDescriptors.js";
 import Processor from "./processors/Processor.js";
-import {} from "./constantSourceNode/AudioNode.js";
 
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
