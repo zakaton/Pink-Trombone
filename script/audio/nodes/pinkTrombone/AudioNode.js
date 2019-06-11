@@ -3,7 +3,7 @@
         *
 */
 
-import ParameterDescriptors from "./processors/workletProcessors/ParameterDescriptors.js";
+import ParameterDescriptors from "./processors/ParameterDescriptors.js";
 import Processor from "./processors/Processor.js";
 
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -82,7 +82,7 @@ function assignAudioParam(audioNode, audioParam, paramName) {
     }
 }
 
-if(false && window.AudioWorklet !== undefined) {
+if(window.AudioWorklet !== undefined) {
     class PinkTromboneNode extends AudioWorkletNode {
         constructor(audioContext) {
             super(audioContext, "pink-trombone-worklet-processor");

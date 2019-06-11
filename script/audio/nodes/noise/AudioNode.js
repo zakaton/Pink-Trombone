@@ -5,7 +5,7 @@
 
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
-if(false) {
+if(false) { // the buffer is more optimal
 
     // Noise WorkletNode
     class NoiseNode extends AudioWorkletNode {
