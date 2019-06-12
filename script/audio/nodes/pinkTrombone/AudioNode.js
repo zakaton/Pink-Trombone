@@ -85,9 +85,8 @@ function assignAudioParam(audioNode, audioParam, paramName) {
 if(window.AudioWorklet !== undefined) {
     class PinkTromboneNode extends AudioWorkletNode {
         constructor(audioContext) {
-            console.log("before")
             super(audioContext, "pink-trombone-worklet-processor");
-            console.log("after");
+
             setupNode(this);
 
             this.parameters.forEach((audioParam, paramName) => {

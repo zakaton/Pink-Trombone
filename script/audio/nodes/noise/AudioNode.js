@@ -5,54 +5,20 @@
 
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
-if(false) { // the buffer is more optimal
+window.AudioContext.prototype.createNoise = function() {
+    const noiseNode = this.createBufferSource();
 
-    // Noise WorkletNode
-    class NoiseNode extends AudioWorkletNode {
-        constructor(audioContext) {
-            super(audioContext, "noise-worklet-processor");
+    const seconds = 1;
 
-            this.port.onmessage = (event) => {
-                switch(event.data.name) {
-                    default:
-                        break;
-                }
-            }
-        }
+    const buffer = this.createBuffer(1, seconds*this.sampleRate, this.sampleRate);
+    const bufferChannel = buffer.getChannelData(0);
+    for(let sampleIndex = 0; sampleIndex < bufferChannel.length; sampleIndex++)
+        bufferChannel[sampleIndex] = ((Math.random(0) *2) -1);
 
-        start() {
-            return this.port.postMessage({
-                name : "start",
-            });
-        }
-        stop() {
-            return this.port.postMessage({
-                name : "stop",
-            });
-        }
-    }
+    noiseNode.buffer = buffer;
+    noiseNode.loop = true;
 
-    window.AudioContext.prototype.createNoise = function() {
-        return new NoiseNode(this, ...arguments);
-    }
-}
-else {
-    // ScriptProcessorNode
-    window.AudioContext.prototype.createNoise = function() {
-        const noiseNode = this.createBufferSource();
-
-        const seconds = 1;
-
-        const buffer = this.createBuffer(1, seconds*this.sampleRate, this.sampleRate);
-        const bufferChannel = buffer.getChannelData(0);
-        for(let sampleIndex = 0; sampleIndex < bufferChannel.length; sampleIndex++)
-            bufferChannel[sampleIndex] = ((Math.random(0) *2) -1);
-
-        noiseNode.buffer = buffer;
-        noiseNode.loop = true;
-
-        return noiseNode;
-    }
+    return noiseNode;
 }
 
 export {};

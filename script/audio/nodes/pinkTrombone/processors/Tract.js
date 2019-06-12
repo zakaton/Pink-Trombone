@@ -179,7 +179,7 @@ class Tract {
             outputSample += this._processLips(parameterSamples, bufferInterpolation, updateAmplitudes);
             outputSample += this._processNose(parameterSamples, bufferInterpolation, updateAmplitudes);
         
-        if(outputSample == null)
+        if(isNaN(outputSample))
             this.reset();
 
         return outputSample;
@@ -433,6 +433,18 @@ class Tract {
 
             this.nose.reflection.value = this.nose.reflection.new;
             this.nose.reflection.new = (2 * this.nose.amplitude[0] - sum) / sum;
+    }
+
+    reset() {
+        this.right.fill(0);
+            this.right.junction.fill(0);
+        this.left.fill(0);
+            this.left.junction.fill(0);
+        
+        this.nose.left.fill(0);
+            this.nose.left.junction.fill(0);
+        this.nose.right.fill(0);
+            this.nose.right.junction.fill(0);
     }
 }
 

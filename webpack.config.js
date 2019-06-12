@@ -7,10 +7,9 @@ module.exports = {
         app : {
             "component" : './script/component.js',
             "pink-trombone" : './script/audio/nodes/pinkTrombone/processors/WorkletProcessor.js',
-            "noise" : './script/audio/nodes/noise/processors/WorkletProcessor.js'
         }[whichFile]
+        
         // app: './script/component.js'
-        // app: './script/audio/nodes/noise/processors/WorkletProcessor.js'
         // app: './script/audio/nodes/pinkTrombone/processors/WorkletProcessor.js'
     },
     output: {
@@ -18,11 +17,9 @@ module.exports = {
         filename : {
             "component" : 'pink-trombone.min.js',
             "pink-trombone" : 'pink-trombone-worklet-processor.min.js',
-            "noise" : 'noise-worklet-processor.min.js',
         }[whichFile]
 
         // filename: 'pink-trombone.min.js'
-        // filename: 'noise-worklet-processor.min.js'
         // filename: 'pink-trombone-worklet-processor.min.js'
 
     },

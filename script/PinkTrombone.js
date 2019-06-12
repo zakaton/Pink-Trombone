@@ -12,13 +12,8 @@ window.AudioContext = window.AudioContext || window.webkitAudioContext;
 class PinkTrombone {
     addModules(audioContext) {
         if(audioContext.audioWorklet !== undefined) {
-            return Promise.all([
-                audioContext.audioWorklet.addModule("./noise-worklet-processor.min.js"),
-                audioContext.audioWorklet.addModule("./pink-trombone-worklet-processor.min.js"),
-                
-                //audioContext.audioWorklet.addModule("./script/audio/nodes/noise/processors/WorkletProcessor.js"),
-                //audioContext.audioWorklet.addModule("./script/audio/nodes/pinkTrombone/processors/WorkletProcessor.js"),
-            ]);
+            //return audioContext.audioWorklet.addModule("./script/audio/nodes/pinkTrombone/processors/WorkletProcessor.js")
+            return audioContext.audioWorklet.addModule("./pink-trombone-worklet-processor.min.js");
         }
         else {
             return new Promise((resolve, reject) => {

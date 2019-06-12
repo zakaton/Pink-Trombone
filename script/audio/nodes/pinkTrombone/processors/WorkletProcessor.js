@@ -2,6 +2,7 @@
     TODO
         *
 */
+
 import ParameterDescriptors from "./ParameterDescriptors.js";
 import Processor from "./Processor.js";
 
@@ -79,15 +80,18 @@ class PinkTromboneWorkletProcessor extends AudioWorkletProcessor {
     process(inputs, outputs, parameters) {
         const constrictions = this._getConstrictions(parameters);
 
-        for(let outputIndex = 0; outputIndex < outputs.length; outputIndex++)
-            for(let channelIndex = 0; channelIndex < outputs[outputIndex].length; channelIndex++)
+        for(let outputIndex = 0; outputIndex < outputs.length; outputIndex++) {
+            for(let channelIndex = 0; channelIndex < outputs[outputIndex].length; channelIndex++) {
                 for(let sampleIndex = 0; sampleIndex < outputs[outputIndex][channelIndex].length; sampleIndex++) {                    
                     const parameterSamples = this._getParameterSamples(parameters, sampleIndex);
                     const seconds = currentTime + (sampleIndex/sampleRate);
-                                        
-                    outputs[outputIndex][channelIndex][sampleIndex] = this.processor.process(parameterSamples, sampleIndex, outputs[outputIndex][channelIndex].length, seconds);
-                }
+                    const outputSample = this.processor.process(parameterSamples, sampleIndex, outputs[outputIndex][channelIndex].length, seconds);
 
+                    outputs[outputIndex][channelIndex][sampleIndex] = outputSample;
+                }
+            }
+        }
+                
         this.processor.update(currentTime + (outputs[0][0].length/sampleRate), constrictions);
 
         return true;
