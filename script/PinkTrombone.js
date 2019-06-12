@@ -13,8 +13,11 @@ class PinkTrombone {
     addModules(audioContext) {
         if(audioContext.audioWorklet !== undefined) {
             return Promise.all([
-                audioContext.audioWorklet.addModule("/script/audio/nodes/noise/processors/WorkletProcessor.js"),
-                audioContext.audioWorklet.addModule("/script/audio/nodes/pinkTrombone/processors/WorkletProcessor.js"),
+                audioContext.audioWorklet.addModule("./noise-worklet-processor.min.js"),
+                audioContext.audioWorklet.addModule("./pink-trombone-worklet-processor.min.js"),
+                
+                //audioContext.audioWorklet.addModule("./script/audio/nodes/noise/processors/WorkletProcessor.js"),
+                //audioContext.audioWorklet.addModule("./script/audio/nodes/pinkTrombone/processors/WorkletProcessor.js"),
             ]);
         }
         else {

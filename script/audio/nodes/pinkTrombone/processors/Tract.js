@@ -47,7 +47,6 @@ class Tract {
             offset : 1.7,
         };
 
-
         // Buffers
         this.right = new Float64Array(this.length);
             this.right.junction = new Float64Array(this.length+1);
@@ -65,13 +64,12 @@ class Tract {
         
         this.reflection = new Float64Array(this.length+1);
             this.reflection.new = new Float64Array(this.length+1);
-        
+
         this.amplitude = new Float64Array(this.length);
             this.amplitude.max = new Float64Array(this.length);
         
         this.diameter = new Float64Array(this.length);
             this.diameter.rest = new Float64Array(this.length);
-
 
         // Tongue & Nose
         this.tongue = {
@@ -180,6 +178,10 @@ class Tract {
         var outputSample = 0;
             outputSample += this._processLips(parameterSamples, bufferInterpolation, updateAmplitudes);
             outputSample += this._processNose(parameterSamples, bufferInterpolation, updateAmplitudes);
+        
+        if(outputSample == null)
+            this.reset();
+
         return outputSample;
     }
 

@@ -12,14 +12,19 @@ class Nose {
         this.fade = 1;
         this.offset = 0.8;
 
+        // buffers
         this.left = new Float64Array(this.length);
             this.left.junction = new Float64Array(this.length+1);
+
         this.right = new Float64Array(this.length);
             this.right.junction = new Float64Array(this.length+1);
+
         this.reflection = new Float64Array(this.length+1);
             this.reflection.value = 0;
             this.reflection.new = 0;
+
         this.diameter = new Float64Array(this.length);
+
         this.amplitude = new Float64Array(this.length);
             this.amplitude.max = new Float64Array(this.length);
         

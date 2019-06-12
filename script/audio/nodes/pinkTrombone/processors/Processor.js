@@ -23,6 +23,7 @@ class Processor {
         outputSample += this.tract.process(parameterSamples, sampleIndex, bufferLength, seconds);
 
         outputSample *= 0.125;
+
         return outputSample;
     }
 
