@@ -197,6 +197,10 @@ class PinkTromboneElement extends HTMLElement {
         this.loadPromise = this.pinkTrombone.loadPromise
             .then(audioContext => {
                 this.parameters = this.pinkTrombone.parameters;
+
+                for(let parameterName in this.pinkTrombone.parameters)
+                    this[parameterName] = this.pinkTrombone.parameters[parameterName];
+
                 return this.pinkTrombone;
             });
         return this.loadPromise;
