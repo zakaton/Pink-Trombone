@@ -13,6 +13,7 @@
                 pinkTromboneElement.setAudioContext()
                     .then(pinkTrombone => {
                         pinkTromboneElement.connect(pinkTromboneElement.audioContext.destination);
+                        pinkTromboneElement.start();
                     });
             });
     
