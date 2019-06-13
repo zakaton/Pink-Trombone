@@ -259,6 +259,6 @@ _voiced and voiceless consonants share the same values, differing in [voiceness]
 
 ## 🙏 Developer Wishlist
 *Our time is limited, so we'd greatly appreciate it if you guys could implement some of these ideas:*
-- [ ] IPA Speak n' Say (analyze voice input and approximate Pink Trombone representation)
+- [ ] IPA Speak n' See (analyze voice input and approximate Pink Trombone representation)
 - [ ] Phonetic Voice Editor (Text Editor + Digital Audio Workstation)
 - [ ] [Speech Synthesis Markup Language](https://www.w3.org/TR/speech-synthesis11/) (SSML) emulator
