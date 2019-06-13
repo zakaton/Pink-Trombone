@@ -1,6 +1,5 @@
-__STILL UNDER CONSTRUCTION - DON'T USE IT YET__
-
-<a href="https://twitter.com/ConcreteSciFi/status/1138555909133594624" target="_blank">![Fabien](images/pinkTrombone.gif)</a>
+<a href="https://twitter.com/ConcreteSciFi/status/1138555909133594624" target="_blank">![Fabien](images/pinkTrombone.gif)</a><br>
+_Sound is generated in the glottis (at the bottom left), then filtered by the shape of the vocal tract. The voicebox controls the pitch and intensity of the initial sound_ - [Neil Thapen](http://venuspatrol.nfshost.com/)
 
 # 🗣️ Pink Trombone - Bare-handed Speech Synthesis
 _A programmable version of [Neil Thapen's](http://venuspatrol.nfshost.com/) famous and wonderful [Pink Trombone](https://dood.al/pinktrombone/)_
@@ -12,16 +11,18 @@ _A programmable version of [Neil Thapen's](http://venuspatrol.nfshost.com/) famo
 
 [👀 Enabling and Disabling the UI](#-enabling-and-disabling-the-ui)
 
-[🎺 Setting the Volume, Pitch & Voiceness](#-setting-the-volume,-pitch-&-voiceness)
+[🎛️ Audio Parameters](#-audio-parameters)
 
-[👅 Articulating the Tongue and Vocal Tract](#-articulating-the-tongue-and-vocal-tract)
+[🎺 Manipulating Vocal Tract Constrictions](#-manipulating-vocal-tract-constrictions)
+
+[👅 Common Phonemes](#-common-phonemes)
 
 [🏆 Developer Showcase](#-developer-showcase)
 
 [🙏 Developer Wishlist](#-developer-wishlist)
 
 ## 📦 Setting Up
-1. Save a local copy of [`pink-trombone.min.js`](https://raw.githubusercontent.com/zakaton/Pink-Trombone/master/pink-trombone.min.js) and [`pink-trombone-worklet-processor.min.js`](https://raw.githubusercontent.com/zakaton/Pink-Trombone/master/pink-trombone-worklet-processor.min.js)
+1. Save a local copy of [`pink-trombone.min.js`](https://raw.githubusercontent.com/zakaton/Pink-Trombone/master/pink-trombone.min.js) and [`pink-trombone-worklet-processor.min.js`](https://raw.githubusercontent.com/zakaton/Pink-Trombone/master/pink-trombone-worklet-processor.min.js) and make sure they're both in the same relative location (the first will import the other as a [Audio Worklet Processor](https://developers.google.com/web/updates/2017/12/audio-worklet))
 
 2. In your HTML `<head></head>` element, insert the file in a script element:
 ```html
@@ -33,26 +34,31 @@ _A programmable version of [Neil Thapen's](http://venuspatrol.nfshost.com/) famo
 <pink-trombone></pink-trombone>
 ```
 
-4. Add a `load` eventListener to the `<pink-trombone></pink-trombone>` element:
+4. In your JavaScript code, grab the `<pink-trombone></pink-trombone>` element:
 ```javascript
-document.querySelector("pink-trombone").addEventListener("load", myCallback);
+var pinkTromboneElement = document.querySelector("pink-trombone").addEventListener("load", myCallback);
 ```
 
-5. In the `"load"` callback, assign an [Audio Context](https://developer.mozilla.org/en-US/docs/Web/API/AudioContext) using `.setAudioContext(myAudioContext)` (if none is specified, an Audio Context instance is created for you):
+5. Add a `load` eventListener to the `pinkTromboneElement` element:
+```javascript
+pinkTromboneElement.addEventListener("load", myCallback);
+```
+
+6. In the `"load"` callback, assign an [Audio Context](https://developer.mozilla.org/en-US/docs/Web/API/AudioContext) using `.setAudioContext(myAudioContext)` (if none is specified, an Audio Context instance is created for you):
 ```javascript
 function myCallback(event) {
-  event.target.setAudioContext(myAudioContext)
+  pinkTromboneElement.setAudioContext(myAudioContext)
 }
 ```
 This method returns a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) once the [AudioWorkletProcessor](https://github.com/zakaton/Pink-Trombone/blob/master/script/audio/nodes/pinkTrombone/processors/WorkletProcessor.js) module is loaded.
 
-6. In the [promise resolution](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then), a [Pink Trombone audio node](https://github.com/zakaton/Pink-Trombone/blob/master/script/audio/nodes/pinkTrombone/AudioNode.js) is created, which you can connect to other audio nodes from the scope of the `<pink-trombone></pink-trombone>` element:
+7. In the [promise resolution](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then), a [Pink Trombone audio node](https://github.com/zakaton/Pink-Trombone/blob/master/script/audio/nodes/pinkTrombone/AudioNode.js) is created, which you can connect to other audio nodes from the scope of the `<pink-trombone></pink-trombone>` element:
 ```javascript
 function myCallback(event) {
-  event.target.setAudioContext(myAudioContext)
+  pinkTromboneElement.setAudioContext(myAudioContext)
     .then(() => {
-      const audioContext = document.querySelector("pink-trombone")
-      document.querySelector("pink-trombone").connect(audioContext.destination);
+      const audioContext = pinkTromboneElement.audioContext
+      pinkTromboneElement.connect(audioContext.destination);
     });
 }
 ```
@@ -60,53 +66,91 @@ function myCallback(event) {
 ## 👄 Producing Sound
 😃 To start generating sound, run the `.start()` method:
 ```javascript
-      document.querySelector("pink-trombone").start();
+pinkTromboneElement.start();
 ```
 
 🤐 To stop generating sound, run the `.stop()` method:
 ```javascript
-      document.querySelector("pink-trombone").stop();
+pinkTromboneElement.stop();
 ```
 
 ## 👀 Enabling and Disabling the UI
 🙂 To show the interactive visualization:
 ```javascript
-      document.querySelector("pink-trombone").enableUI();
+pinkTromboneElement.enableUI();
+```
+✍️ To start animating the visualization:
+```javascript
+pinkTromboneElement.startUI();
+```
+
+🛑 To stop animating the visualization:
+```javascript
+pinkTromboneElement.stopUI();
 ```
 
 😊 To hide the interactive visualization:
 ```javascript
-document.querySelector("pink-trombone").disableUI();
+pinkTromboneElement.disableUI();
 ```
 
-## 🎺 Setting the Volume, Pitch & Voiceness
 
-🎚️ To change the volume:
+## 🎛️ Audio Parameters
+The [audio parameters](https://developer.mozilla.org/en-US/docs/Web/API/AudioParam) of the [Pink Trombone audio node](https://github.com/zakaton/Pink-Trombone/blob/master/script/audio/nodes/pinkTrombone/AudioNode.js) can be accessed from the `<pink-trombone></pink-trombone>` element's scope:
+
+🎚️ Intensity
 ```javascript
-document.querySelector("pink-trombone").intensity.value = newIntensityValue;
+pinkTromboneElement.intensity;
 ```
-
-🎵 To change the pitch frequency, set the `frequency` [audio parameter](https://developer.mozilla.org/en-US/docs/Web/API/AudioParam):
+🎵 Frequency
 ```javascript
-document.querySelector("pink-trombone").frequency.value = newFrequencyValue;
+pinkTromboneElement.frequency;
 ```
-
-
-👄 To change the [voiceness](https://en.wikipedia.org/wiki/Voice_(phonetics)):
+👄 Tenseness
 ```javascript
-document.querySelector("pink-trombone");
+pinkTromboneElement.tenseness;
+```
+📢 Loudness
+```javascript
+pinkTromboneElement.loudness;
+```
+〰️ Vibrato
+```javascript
+pinkTromboneElement.vibrato.frequency;
+pinkTromboneElement.vibrato.gain;
+pinkTromboneElement.vibrato.wobble;
+```
+👅 Tongue
+```javascript
+// 'index' and 'diameter' refer to the tongue's location in the mouth
+pinkTromboneElement.tongue.index;
+pinkTromboneElement.tongue.diameter;
 ```
 
-## 👅 Articulating the Tongue and Vocal Tract
-To set the Tongue Articulation, set:
+To change the [voiceness](https://en.wikipedia.org/wiki/Voice_(phonetics) between voiced and voiceless, change the `.tenseness` and `.loudness` [audio parameters](https://developer.mozilla.org/en-US/docs/Web/API/AudioParam) as follows:
 ```javascript
-document.querySelector("pink-trombone").tongue.index.value = newIndexValue;
-document.querySelector("pink-trombone").tongue.diameter.value = newDiameterValue;
+function setVoiceness(voiceness) {
+  const tenseness = 1 - Math.cos((voiceness) * Math.PI * 0.5);
+  const loudness = Math.pow(tenseness, 0.25);
+  
+  pinkTromboneElement.tenseness.value = tenseness;
+  pinkTromboneElement.loudness.value = loudness;
+}
+
+// voiced
+setVoiceness(1);
+
+// voiceless
+setVoiceness(0);
 ```
+_Later on I may add a `.voiceness` [audio parameter](https://developer.mozilla.org/en-US/docs/Web/API/AudioParam) that automates this - for now I'm just adopting the [original version](https://dood.al/pinktrombone/)_
+
+## 🎺 Manipulating Vocal Tract Constrictions
+Vocal Tract constrictions comprise of an object containing `.index` and `.diameter` [Audio Parameter](https://developer.mozilla.org/en-US/docs/Web/API/AudioParam) properties that are implicitly connected to the [Pink Trombone audio node](https://github.com/zakaton/Pink-Trombone/blob/master/script/audio/nodes/pinkTrombone/AudioNode.js)
 
 To add a vocal tract constriction:
 ```javascript
-var myConstriction = document.querySelector("pink-trombone").newConstriction(indexValue, diameterValue);
+var myConstriction = pinkTromboneElement.newConstriction(indexValue, diameterValue);
 ```
 
 To set a vocal tract constriction:
@@ -117,11 +161,104 @@ myConstriction.diameter.value = newDiameterValue;
 
 To remove a vocal tract constriction:
 ```javascript
-document.querySelector("pink-trombone").removeConstriction(myConstriction);
+pinkTromboneElement.removeConstriction(myConstriction);
 ```
+
+## 👅 Common Phonemes
+For reference, here are some preset index & diameter preset values for [some phonemes](http://www.internationalphoneticalphabet.org/ipa-sounds/ipa-chart-with-sounds/):
+
+👅 Tongue phonemes:
+
+æ [pat]
+  - index : 14.93
+  - diameter : 2.78
+  
+ɑ [part]
+  - index : 2.3
+  - diameter : 12.75
+  
+ɒ [pot]
+  - index : 12
+  - diameter : 2.05
+  
+ɔ [port (rounded)]
+  - index : 17.7
+  - diameter : 2.05
+  
+ɪ [pit]
+  - index : 26.11
+  - diameter : 2.87
+  
+i [peat]
+  - index : 27.2
+  - diameter : 2.2
+  
+e [pet]
+  - index : 19.4
+  - diameter : 3.43
+  
+ʌ [put]
+  - index : 17.8
+  - diameter : 2.46
+  
+u [poot (rounded)]
+  - index : 22.8
+  - diameter : 2.05
+  
+ə [pert]
+  - index : 20.7
+  - diameter : 2.8
+
+🎺 [Vocal Tract Constriction](https://en.wikipedia.org/wiki/Manner_of_articulation) phonemes:
+_voiced and voiceless consonants share the same values, differing in [voiceness](https://en.wikipedia.org/wiki/Voice_(phonetics))_
+
+- [fricatives](https://en.wikipedia.org/wiki/Fricative_consonant)
+
+  - (ʒ, ʃ) ["s" in "pleasure"]
+    - index : 31
+    - diameter : 0.6
+    
+  - (z, s) ["z" in "zoo"]
+    - index : 36
+    - diameter : 0.6
+    
+  - (v, f) ["v" in "very"]
+    - index : 41
+    - diameter : 0.5
+    
+- [stops](https://en.wikipedia.org/wiki/Stop_consonant)
+
+  - (g, k) ["g" in "go"]
+    - index : 20
+    - diameter : 0
+    
+  - (d, t) ["d" in "den"]
+    - index : 36
+    - diameter : 0
+    
+  - (b, p) ["b" in "bad"]
+    - index : 41
+    - diameter : 0
+
+- [nasals](https://en.wikipedia.org/wiki/Nasal_consonant)
+
+  - (ŋ) ["ng" in "hang"]
+    - index : 20
+    - diameter : -1
+    
+  - (n) ["n" in "not"]
+    - index : 36
+    - diameter : -1
+    
+  - (m) ["m" in "woman"]
+    - index : 41
+    - diameter : -1
 
 ## 🏆 Developer Showcase
 *Send us an email at zack@ukaton.com if you have a cool application made with our api!*
 
 ## 🙏 Developer Wishlist
-_Our time is limited, so we'd greatly appreciate it if you guys could implement some of these ideas:_
+*Our time is limited, so we'd greatly appreciate it if you guys could implement some of these ideas:*
+- [ ] IPA Speak n' Say (analyze voice input and approximate Pink Trombone representation)
+- [ ] Phonetic Voice Editor (Text Editor + Digital Audio Workstation)
+- [ ] [Speech Synthesis Markup Language](https://www.w3.org/TR/speech-synthesis11/) (SSML) emulator
