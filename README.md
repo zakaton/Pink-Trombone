@@ -24,9 +24,9 @@ _A programmable version of [Neil Thapen's](http://venuspatrol.nfshost.com/) famo
 ## 📦 Setting Up
 1. Save a local copy of [`pink-trombone.min.js`](https://raw.githubusercontent.com/zakaton/Pink-Trombone/master/pink-trombone.min.js) and [`pink-trombone-worklet-processor.min.js`](https://raw.githubusercontent.com/zakaton/Pink-Trombone/master/pink-trombone-worklet-processor.min.js) and make sure they're both in the same relative location (the first will import the other as a [Audio Worklet Processor](https://developers.google.com/web/updates/2017/12/audio-worklet))
 
-2. In your HTML `<head></head>` element, insert the file in a script element:
+2. In your HTML `<head></head>` element, insert the file in a script element as a [module](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules):
 ```html
-<script src="pink-trombone.min.js"></script>
+<script src="pink-trombone.min.js" type="module"></script>
 ```
 
 3. In your HTML `<body></body>` element, insert the following custom element:
@@ -36,7 +36,7 @@ _A programmable version of [Neil Thapen's](http://venuspatrol.nfshost.com/) famo
 
 4. In your JavaScript code, grab the `<pink-trombone></pink-trombone>` element:
 ```javascript
-var pinkTromboneElement = document.querySelector("pink-trombone").addEventListener("load", myCallback);
+var pinkTromboneElement = document.querySelector("pink-trombone");
 ```
 
 5. Add a `load` eventListener to the `pinkTromboneElement` element:
@@ -127,7 +127,7 @@ pinkTromboneElement.tongue.index;
 pinkTromboneElement.tongue.diameter;
 ```
 
-To change the [voiceness](https://en.wikipedia.org/wiki/Voice_(phonetics) between voiced and voiceless, change the `.tenseness` and `.loudness` [audio parameters](https://developer.mozilla.org/en-US/docs/Web/API/AudioParam) as follows:
+To change the [voiceness](https://en.wikipedia.org/wiki/Voice_(phonetics)) between voiced and voiceless, change the `.tenseness` and `.loudness` [audio parameters](https://developer.mozilla.org/en-US/docs/Web/API/AudioParam) as follows:
 ```javascript
 function setVoiceness(voiceness) {
   const tenseness = 1 - Math.cos((voiceness) * Math.PI * 0.5);
@@ -209,10 +209,11 @@ u [poot (rounded)]
   - index : 20.7
   - diameter : 2.8
 
+
 🎺 [Vocal Tract Constriction](https://en.wikipedia.org/wiki/Manner_of_articulation) phonemes:
 _voiced and voiceless consonants share the same values, differing in [voiceness](https://en.wikipedia.org/wiki/Voice_(phonetics))_
 
-- [fricatives](https://en.wikipedia.org/wiki/Fricative_consonant)
+- [Fricatives](https://en.wikipedia.org/wiki/Fricative_consonant)
 
   - (ʒ, ʃ) ["s" in "pleasure"]
     - index : 31
@@ -226,7 +227,7 @@ _voiced and voiceless consonants share the same values, differing in [voiceness]
     - index : 41
     - diameter : 0.5
     
-- [stops](https://en.wikipedia.org/wiki/Stop_consonant)
+- [Stops](https://en.wikipedia.org/wiki/Stop_consonant)
 
   - (g, k) ["g" in "go"]
     - index : 20
@@ -240,7 +241,7 @@ _voiced and voiceless consonants share the same values, differing in [voiceness]
     - index : 41
     - diameter : 0
 
-- [nasals](https://en.wikipedia.org/wiki/Nasal_consonant)
+- [Nasals](https://en.wikipedia.org/wiki/Nasal_consonant)
 
   - (ŋ) ["ng" in "hang"]
     - index : 20
@@ -259,6 +260,6 @@ _voiced and voiceless consonants share the same values, differing in [voiceness]
 
 ## 🙏 Developer Wishlist
 *Our time is limited, so we'd greatly appreciate it if you guys could implement some of these ideas:*
-- [ ] IPA Speak n' See (analyze voice input and approximate Pink Trombone representation)
-- [ ] Phonetic Voice Editor (Text Editor + Digital Audio Workstation)
-- [ ] [Speech Synthesis Markup Language](https://www.w3.org/TR/speech-synthesis11/) (SSML) emulator
+- [ ] __IPA Speak n' See__ 🗣️💬 - Take input speech from the user using the [Media Recording API](https://developer.mozilla.org/en-US/docs/Web/API/MediaStream_Recording_API) and approximate their articulation using the Pink Trombone, allowing speakers to visualize how they speak.
+- [ ] __Phonetic Voice Editor__ 🎹👄⌨️ - Create a cross between a [Text Editor](https://en.wikipedia.org/wiki/List_of_text_editors) and a [Digita Audio Workstation](https://en.wikipedia.org/wiki/Digital_audio_workstation), where the user can type in phonemes instead of characters, with [automation](https://en.wikipedia.org/wiki/Mix_automation) to programmatically adjust the cadence, pitch, and other features over time.
+- [ ] __SSML Simulator__ 📝💬 - Implement a [Speech Synthesis Markup Language](https://en.wikipedia.org/wiki/Speech_Synthesis_Markup_Language) emulator that can take an [utterance](https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesisUtterance) and process the speech request using Pink Trombone's audio processing
