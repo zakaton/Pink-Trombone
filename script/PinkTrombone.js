@@ -54,6 +54,7 @@ class PinkTrombone {
             this._fricativeFilter.connect(this._pinkTromboneNode.noise);
 
         this._gain = this.audioContext.createGain();
+            this._gain.gain.value = 0;
             this._pinkTromboneNode.connect(this._gain);
     }
 
@@ -69,10 +70,10 @@ class PinkTrombone {
     }
 
     start() {
-        this._noise.start();
+        this._gain.gain.value = 1;
     }
     stop() {
-        this._noise.stop();
+        this._gain.gain.value = 0;
     }
 
     get constrictions() {

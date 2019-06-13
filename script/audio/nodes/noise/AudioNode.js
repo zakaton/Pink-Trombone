@@ -18,6 +18,8 @@ window.AudioContext.prototype.createNoise = function() {
     noiseNode.buffer = buffer;
     noiseNode.loop = true;
 
+    noiseNode.start();
+    
     return noiseNode;
 }
 

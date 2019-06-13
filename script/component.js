@@ -29,6 +29,7 @@ class PinkTromboneElement extends HTMLElement {
 
                 this.addEventListener("resume", event => {
                     this.audioContext.resume();
+                    this.pinkTrombone.start();
                     event.target.dispatchEvent(new CustomEvent("didResume"));
                 });
     
@@ -168,7 +169,20 @@ class PinkTromboneElement extends HTMLElement {
     disableUI() {
         if(this.UI !== undefined) {
             this.UI.hide();
+            this.stopUI();
         }
+    }
+
+    startUI() {
+        if(this.UI !== undefined) {
+            this._isRunning = true;
+            window.requestAnimationFrame(highResTimeStamp => {
+                this._requestAnimationFrameCallback(highResTimeStamp);
+            });    
+        }
+    }
+    stopUI() {
+        this._isRunning = false;
     }
 
     // getAttribute getter?
@@ -228,30 +242,23 @@ class PinkTromboneElement extends HTMLElement {
 
     start() {
         if(this.pinkTrombone) {
-            this.isRunning = true;
-            
-            if(this.UI !== undefined) {
-                window.requestAnimationFrame(highResTimeStamp => {
-                    this._requestAnimationFrameCallback(highResTimeStamp);
-                });
-            }
-
-            return this.pinkTrombone.start();
+            this.pinkTrombone.start();
+            this.startUI();
         }
         else
             throw "Pink Trombone hasn't been set yet";
     }
     stop() {
         if(this.pinkTrombone) {
-            this.isRunning = false;
-            return this.pinkTrombone.stop();
+            this.pinkTrombone.stop();
+            this.stopUI();
         }
         else
             throw "Pink Trombone hasn't been set yet";
     }
 
     _requestAnimationFrameCallback(highResTimeStamp) {
-        if(this.isRunning) {
+        if(this._isRunning) {
             this._animationFrameObservers.forEach(element => {
                 const customEvent = new CustomEvent("animationFrame", {
                     detail : {
