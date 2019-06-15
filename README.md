@@ -21,6 +21,8 @@ _A programmable version of [Neil Thapen's](http://venuspatrol.nfshost.com/) famo
 
 [🙏 Developer Wishlist](#-developer-wishlist)
 
+[📖 Bibliography](#-bibliography)
+
 ## 📦 Setting Up
 1. Save a local copy of [`pink-trombone.min.js`](https://raw.githubusercontent.com/zakaton/Pink-Trombone/master/pink-trombone.min.js) and [`pink-trombone-worklet-processor.min.js`](https://raw.githubusercontent.com/zakaton/Pink-Trombone/master/pink-trombone-worklet-processor.min.js) and make sure they're both in the same relative location (the first will import the other as a [Audio Worklet Processor](https://developers.google.com/web/updates/2017/12/audio-worklet))
 
@@ -263,3 +265,12 @@ _voiced and voiceless consonants share the same values, differing in [voiceness]
 - [ ] __IPA Speak n' See__ 🗣️💬 - Take input speech from the user using the [Media Recording API](https://developer.mozilla.org/en-US/docs/Web/API/MediaStream_Recording_API) and approximate their articulation using the Pink Trombone, allowing speakers to visualize how they speak.
 - [ ] __Phonetic Voice Editor__ 🎹👄⌨️ - Create a cross between a [Text Editor](https://en.wikipedia.org/wiki/List_of_text_editors) and a [Digita Audio Workstation](https://en.wikipedia.org/wiki/Digital_audio_workstation), where the user can type in phonemes instead of characters, with [automation](https://en.wikipedia.org/wiki/Mix_automation) to programmatically adjust the cadence, pitch, and other features over time.
 - [ ] __SSML Simulator__ 📝💬 - Implement a [Speech Synthesis Markup Language](https://en.wikipedia.org/wiki/Speech_Synthesis_Markup_Language) emulator that can take an [utterance](https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesisUtterance) and process the speech request using Pink Trombone's audio processing
+
+## 📖 Bibliography
+- [Julius O. Smith III, "Physical audio signal processing for virtual musical instruments and audio effects."](https://ccrma.stanford.edu/~jos/pasp/)
+- [Story, Brad H. "A parametric model of the vocal tract area function for vowel and consonant simulation." 
+The Journal of the Acoustical Society of America 117.5 (2005): 3231-3254.](http://sal.arizona.edu/sites/default/files/story_jasa2005.pdf)
+- [Lu, Hui-Ling, and J. O. Smith. "Glottal source modeling for singing voice synthesis." 
+Proceedings of the 2000 International Computer Music Conference. 2000.](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.142.5360&rep=rep1&type=pdf)
+- [Mullen, Jack. Physical modelling of the vocal tract with the 2D digital waveguide mesh. 
+PhD thesis, University of York, 2006.](http://www-users.york.ac.uk/~dtm3/Download/JackThesis.pdf)
