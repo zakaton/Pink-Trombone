@@ -259,6 +259,16 @@ _voiced and voiceless consonants share the same values, differing in [voiceness]
 
 ## 🏆 Developer Showcase
 *Send us an email at zack@ukaton.com if you have a cool application made with our api!*
+<a href="https://twitter.com/ConcreteSciFi/status/1212548283895177216?s=20" target="_target">![Zack](developerShowcase/developerShowcase4.gif)</a>
+<br>
+<a href="https://twitter.com/ConcreteSciFi/status/1200218613669449728?s=20" target="_target">![Zack](developerShowcase/developerShowcase3.gif)</a>
+<br>
+<a href="https://twitter.com/ConcreteSciFi/status/1189319140231786498?s=20" target="_target">![Zack](developerShowcase/developerShowcase2.gif)</a>
+<br>
+<a href="https://twitter.com/ConcreteSciFi/status/1162501265374322688?s=20" target="_target">![Zack](developerShowcase/developerShowcase1.gif)</a>
+<br>
+<a href="https://twitter.com/ConcreteSciFi/status/1138555909133594624?s=20" target="_target">![Zack](developerShowcase/developerShowcase0.gif)</a>
+<br>
 
 ## 🙏 Developer Wishlist
 *Our time is limited, so we'd greatly appreciate it if you guys could implement some of these ideas:*
