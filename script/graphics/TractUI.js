@@ -520,10 +520,14 @@ class TractUI {
         });
     }
 
+    _getTouchIdentifier(event) {
+        return window.Touch !== undefined && (event instanceof Touch)
+            ? event.identifier
+            : -1;
+    }
+
     _startEvent(event) {
-        const touchIdentifier = (event instanceof Touch)?
-            event.identifier :
-            -1;
+        const touchIdentifier = this._getTouchIdentifier(event);
 
         if(this._touchConstrictionIndices[touchIdentifier] == undefined) {
             const position = this._getEventPosition(event);
@@ -545,9 +549,7 @@ class TractUI {
         }
     }
     _moveEvent(event) {
-        const touchIdentifier = (event instanceof Touch)?
-            event.identifier :
-            -1;
+        const touchIdentifier = this._getTouchIdentifier(event);
 
         if(this._touchConstrictionIndices[touchIdentifier] !== undefined) {
             const position = this._getEventPosition(event);
@@ -570,9 +572,7 @@ class TractUI {
         }
     }
     _endEvent(event) {
-        const touchIdentifier = (event instanceof Touch)?
-            event.identifier :
-            -1;
+        const touchIdentifier = this._getTouchIdentifier(event);
         
         if(this._touchConstrictionIndices[touchIdentifier] !== undefined) {
             const constrictionIndex = this._touchConstrictionIndices[touchIdentifier];
