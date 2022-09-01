@@ -258,7 +258,7 @@ _voiced and voiceless consonants share the same values, differing in [voiceness]
     - diameter : -1
 
 ## 🏆 Developer Showcase
-*Send us an email at zack@ukaton.com if you have a cool application made with our api!*
+*Send us an email at zack@ukaton.com if you have a cool application made with our api!*  
 <a href="https://twitter.com/ConcreteSciFi/status/1565439155131129857?s=20" target="_target">![Zack](developerShowcase/developerShowcase5.gif)</a>
 <br>
 <a href="https://twitter.com/ConcreteSciFi/status/1212548283895177216?s=20" target="_target">![Zack](developerShowcase/developerShowcase4.gif)</a>
