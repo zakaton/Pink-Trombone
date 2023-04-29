@@ -1,78 +1,157 @@
 <html>
-    <head>
-        <script src="./pink-trombone.min.js" type="module"></script>
-    </head>
-    
-    <body>
-        <pink-trombone></pink-trombone>
+  <head>
+    <!-- <script src="./pink-trombone.min.js" type="module"></script> -->
+    <script src="./script/component.js" type="module"></script>
+  </head>
 
-        <script>
-            const pinkTromboneElement = document.querySelector("pink-trombone");
-            
-            pinkTromboneElement.addEventListener("load", event => {
-                pinkTromboneElement.setAudioContext()
-                    .then(pinkTrombone => {
-                        pinkTromboneElement.enableUI();
-                        pinkTromboneElement.startUI();
-                        pinkTromboneElement.connect(pinkTromboneElement.audioContext.destination);
+  <body>
+    <pink-trombone></pink-trombone>
 
-                        if(false) {
-                            function say(_tongue, _constriction, duration, timeout, intensity, tenseness, frequency) {
-                                return new Promise(resolve => {
-                                    window.setTimeout(() => {
-                                    if(_tongue.index)
-                                        pinkTromboneElement.parameters.tongue.index.linearRampToValueAtTime(_tongue.index, pinkTromboneElement.audioContext.currentTime+duration);
-                                    if(_tongue.diameter)
-                                        pinkTromboneElement.parameters.tongue.diameter.linearRampToValueAtTime(_tongue.diameter, pinkTromboneElement.audioContext.currentTime+duration);
-                                    if(_constriction.index)
-                                        pinkTromboneElement.constrictions[0].index.linearRampToValueAtTime(_constriction.index, pinkTromboneElement.audioContext.currentTime+duration);
-                                    if(_constriction.diameter)
-                                        pinkTromboneElement.constrictions[0].diameter.linearRampToValueAtTime(_constriction.diameter, pinkTromboneElement.audioContext.currentTime+duration);
-                                    
-                                    if(tenseness !== undefined) {
-                                        tenseness = 1 - Math.cos((tenseness) * Math.PI * 0.5);
-                                        pinkTromboneElement.parameters.tenseness.linearRampToValueAtTime(tenseness, pinkTromboneElement.audioContext.currentTime+duration);
-                                        const loudness = Math.pow(tenseness, 0.25);
-                                        pinkTromboneElement.parameters.loudness.linearRampToValueAtTime(loudness, pinkTromboneElement.audioContext.currentTime+duration);
-                                    }
-                                    if(intensity !== undefined)
-                                        pinkTromboneElement.parameters.intensity.linearRampToValueAtTime(intensity, pinkTromboneElement.audioContext.currentTime+duration);
-                                    if(frequency !== undefined)
-                                        pinkTromboneElement.parameters.frequency.linearRampToValueAtTime(frequency, pinkTromboneElement.audioContext.currentTime+duration);
+    <script>
+      const pinkTromboneElement = document.querySelector("pink-trombone");
 
-                                    window.setTimeout(() => {
-                                        resolve();
-                                    }, duration*1000)
-                                    }, timeout);    
-                                });
-                            }
-                            const constriction = pinkTromboneElement.newConstriction(40, 3);
+      pinkTromboneElement.addEventListener("load", (event) => {
+        pinkTromboneElement.setAudioContext().then((pinkTrombone) => {
+          pinkTromboneElement.enableUI();
+          pinkTromboneElement.startUI();
+          pinkTromboneElement.connect(
+            pinkTromboneElement.audioContext.destination
+          );
 
-                            window.say = say;
-                            window.constriction = constriction;
+          if (false) {
+            function say(
+              _tongue,
+              _constriction,
+              duration,
+              timeout,
+              intensity,
+              tenseness,
+              frequency
+            ) {
+              return new Promise((resolve) => {
+                window.setTimeout(() => {
+                  if (_tongue.index)
+                    pinkTromboneElement.parameters.tongue.index.linearRampToValueAtTime(
+                      _tongue.index,
+                      pinkTromboneElement.audioContext.currentTime + duration
+                    );
+                  if (_tongue.diameter)
+                    pinkTromboneElement.parameters.tongue.diameter.linearRampToValueAtTime(
+                      _tongue.diameter,
+                      pinkTromboneElement.audioContext.currentTime + duration
+                    );
+                  if (_constriction.index)
+                    pinkTromboneElement.constrictions[0].index.linearRampToValueAtTime(
+                      _constriction.index,
+                      pinkTromboneElement.audioContext.currentTime + duration
+                    );
+                  if (_constriction.diameter)
+                    pinkTromboneElement.constrictions[0].diameter.linearRampToValueAtTime(
+                      _constriction.diameter,
+                      pinkTromboneElement.audioContext.currentTime + duration
+                    );
 
-                            //                     (_tongue, _constriction, duration, timeout, intensity, tenseness, frequency)
-                            var baseFrequency = pinkTromboneElement.parameters.frequency.value;
-                            window.sayE = () => say({index : 27.5, diameter : 2}, {diameter : 3}, 0.1, 0, 0, undefined, baseFrequency);
-                            window.sayU = () => say({index : 22.6, diameter : 2}, {index : 40, diameter : 0.8}, 0.3, 0.5, 1, undefined, baseFrequency*2^(6/12));
-                            window.sayK = () => say({}, {index : 20, diameter : -0.3}, 0.1, 0.5, 0, 0);
-                            window.sayA = () => say({index : 17, diameter : 3}, {index : 25, diameter : 4}, 0.1, 0, 1, 0.8, baseFrequency*2^(3/12));
-                            window.sayT = () => say({}, {index : 36, diameter : -0.5}, 0.1, 0, 0, 1);
-                            window.sayO = () => say({index : 12.6, diameter : 2.3}, {diameter : 3}, 0.1, 0, 1, undefined, baseFrequency);
-                            window.sayN = () => say({}, {index : 36, diameter : -1.4}, 0.2, 0, 0.2, undefined);
-                            window.shutUp = () => say({}, {}, 0.1, 1, 0);
+                  if (tenseness !== undefined) {
+                    tenseness = 1 - Math.cos(tenseness * Math.PI * 0.5);
+                    pinkTromboneElement.parameters.tenseness.linearRampToValueAtTime(
+                      tenseness,
+                      pinkTromboneElement.audioContext.currentTime + duration
+                    );
+                    const loudness = Math.pow(tenseness, 0.25);
+                    pinkTromboneElement.parameters.loudness.linearRampToValueAtTime(
+                      loudness,
+                      pinkTromboneElement.audioContext.currentTime + duration
+                    );
+                  }
+                  if (intensity !== undefined)
+                    pinkTromboneElement.parameters.intensity.linearRampToValueAtTime(
+                      intensity,
+                      pinkTromboneElement.audioContext.currentTime + duration
+                    );
+                  if (frequency !== undefined)
+                    pinkTromboneElement.parameters.frequency.linearRampToValueAtTime(
+                      frequency,
+                      pinkTromboneElement.audioContext.currentTime + duration
+                    );
 
-                            window.sayUKATON = () => sayE().then(sayU).then(sayK).then(sayA).then(sayT).then(sayO).then(sayN).then(shutUp);
+                  window.setTimeout(() => {
+                    resolve();
+                  }, duration * 1000);
+                }, timeout);
+              });
+            }
+            const constriction = pinkTromboneElement.newConstriction(40, 3);
 
-                            window.addEventListener("keypress", event => {
-                                baseFrequency = pinkTromboneElement.parameters.frequency.value;
-                                window.sayUKATON();
-                            })    
-                        }
-                        
-                    });
+            window.say = say;
+            window.constriction = constriction;
+
+            //                     (_tongue, _constriction, duration, timeout, intensity, tenseness, frequency)
+            var baseFrequency = pinkTromboneElement.parameters.frequency.value;
+            window.sayE = () =>
+              say(
+                { index: 27.5, diameter: 2 },
+                { diameter: 3 },
+                0.1,
+                0,
+                0,
+                undefined,
+                baseFrequency
+              );
+            window.sayU = () =>
+              say(
+                { index: 22.6, diameter: 2 },
+                { index: 40, diameter: 0.8 },
+                0.3,
+                0.5,
+                1,
+                undefined,
+                (baseFrequency * 2) ^ (6 / 12)
+              );
+            window.sayK = () =>
+              say({}, { index: 20, diameter: -0.3 }, 0.1, 0.5, 0, 0);
+            window.sayA = () =>
+              say(
+                { index: 17, diameter: 3 },
+                { index: 25, diameter: 4 },
+                0.1,
+                0,
+                1,
+                0.8,
+                (baseFrequency * 2) ^ (3 / 12)
+              );
+            window.sayT = () =>
+              say({}, { index: 36, diameter: -0.5 }, 0.1, 0, 0, 1);
+            window.sayO = () =>
+              say(
+                { index: 12.6, diameter: 2.3 },
+                { diameter: 3 },
+                0.1,
+                0,
+                1,
+                undefined,
+                baseFrequency
+              );
+            window.sayN = () =>
+              say({}, { index: 36, diameter: -1.4 }, 0.2, 0, 0.2, undefined);
+            window.shutUp = () => say({}, {}, 0.1, 1, 0);
+
+            window.sayUKATON = () =>
+              sayE()
+                .then(sayU)
+                .then(sayK)
+                .then(sayA)
+                .then(sayT)
+                .then(sayO)
+                .then(sayN)
+                .then(shutUp);
+
+            window.addEventListener("keypress", (event) => {
+              baseFrequency = pinkTromboneElement.parameters.frequency.value;
+              window.sayUKATON();
             });
-    
-        </script>
-    </body>
+          }
+        });
+      });
+    </script>
+  </body>
 </html>
