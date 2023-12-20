@@ -12,17 +12,23 @@ class Processor {
         this.tract = new Tract();
     }
 
-    process(parameterSamples, sampleIndex, bufferLength, seconds) {
+    process(inputSamples, parameterSamples, sampleIndex, bufferLength, seconds) {
         var outputSample = 0;
-        
-        const glottisSample = this.glottis.process(...arguments);
-        parameterSamples.glottis = glottisSample;
+
+        if (inputSamples) {
+            parameterSamples.glottis = inputSamples[sampleIndex];
+        } else {
+            const glottisSample = this.glottis.process(...arguments);
+            parameterSamples.glottis = glottisSample;
+        }
 
         outputSample += this.tract.process(...arguments);
-            sampleIndex += 0.5; // process twice - note the "...arguments" doesn't read this
-        outputSample += this.tract.process(parameterSamples, sampleIndex, bufferLength, seconds);
+        sampleIndex += 0.5; // process twice - note the "...arguments" doesn't read this
+        outputSample += this.tract.process(inputSamples, parameterSamples, sampleIndex, bufferLength, seconds);
 
-        outputSample *= 0.125;
+        if (!inputSamples) {
+            outputSample *= 0.125;
+        }
 
         return outputSample;
     }
