@@ -1,20 +1,17 @@
 {
-  "name": "pink-trombone",
-  "version": "1.0.0",
-  "description": "A refactoring of Pink Trombone",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack"
-  },
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "@babel/core": "^7.4.3",
-    "@babel/preset-env": "^7.4.3",
-    "babel-loader": "^8.0.5",
-    "webpack": "^4.30.0",
-    "webpack-cli": "^3.3.0",
-    "webpack-dev-server": "^3.3.1"
-  }
+    "name": "pink-trombone",
+    "version": "1.0.0",
+    "type": "module",
+    "description": "A refactoring of Pink Trombone",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "rollup -c rollup.config.js"
+    },
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {},
+    "dependencies": {
+        "rollup": "^4.9.1"
+    }
 }
