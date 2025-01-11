@@ -29,22 +29,22 @@
             function say(_tongue, _constriction, duration, timeout, intensity, tenseness, frequency) {
               return new Promise((resolve) => {
                 window.setTimeout(() => {
-                  if (_tongue.index)
+                  if (_tongue.index != undefined)
                     pinkTromboneElement.parameters.tongue.index.linearRampToValueAtTime(
                       _tongue.index,
                       pinkTromboneElement.audioContext.currentTime + duration
                     );
-                  if (_tongue.diameter)
+                  if (_tongue.diameter != undefined)
                     pinkTromboneElement.parameters.tongue.diameter.linearRampToValueAtTime(
                       _tongue.diameter,
                       pinkTromboneElement.audioContext.currentTime + duration
                     );
-                  if (_constriction.index)
+                  if (_constriction.index != undefined)
                     pinkTromboneElement.constrictions[0].index.linearRampToValueAtTime(
                       _constriction.index,
                       pinkTromboneElement.audioContext.currentTime + duration
                     );
-                  if (_constriction.diameter)
+                  if (_constriction.diameter != undefined)
                     pinkTromboneElement.constrictions[0].diameter.linearRampToValueAtTime(
                       _constriction.diameter,
                       pinkTromboneElement.audioContext.currentTime + duration
@@ -84,7 +84,7 @@
             window.say = say;
             window.constriction = constriction;
 
-            //                     (_tongue, _constriction, duration, timeout, intensity, tenseness, frequency)
+            // (_tongue, _constriction, duration, timeout, intensity, tenseness, frequency)
             var baseFrequency = pinkTromboneElement.parameters.frequency.value;
             window.sayE = () => say({ index: 27.5, diameter: 2 }, { diameter: 3 }, 0.1, 0, 0, undefined, baseFrequency);
             window.sayU = () =>
