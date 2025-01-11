@@ -17,8 +17,7 @@ class PinkTromboneElement extends HTMLElement {
     window.customElements.whenDefined("pink-trombone").then(() => {
       // RequestAnimationFrame
       this.addEventListener("requestAnimationFrame", (event) => {
-        if (!this._animationFrameObservers.includes(event.target))
-          this._animationFrameObservers.push(event.target);
+        if (!this._animationFrameObservers.includes(event.target)) this._animationFrameObservers.push(event.target);
 
         const customEvent = new CustomEvent("didRequestAnimationFrame");
         event.target.dispatchEvent(customEvent);
@@ -37,18 +36,12 @@ class PinkTromboneElement extends HTMLElement {
         const parameterName = event.detail.parameterName;
         const audioParam = parameterName
           .split(".")
-          .reduce(
-            (audioParam, propertyName) => audioParam[propertyName],
-            this.parameters
-          );
+          .reduce((audioParam, propertyName) => audioParam[propertyName], this.parameters);
         const newValue = Number(event.detail.newValue);
 
         switch (event.detail.type) {
           case "linear":
-            audioParam.linearRampToValueAtTime(
-              newValue,
-              this.audioContext.currentTime + event.detail.timeOffset
-            );
+            audioParam.linearRampToValueAtTime(newValue, this.audioContext.currentTime + event.detail.timeOffset);
             break;
           default:
             audioParam.value = newValue;
@@ -67,10 +60,7 @@ class PinkTromboneElement extends HTMLElement {
         const parameterName = event.detail.parameterName;
         const audioParam = parameterName
           .split(".")
-          .reduce(
-            (audioParam, propertyName) => audioParam[propertyName],
-            this.parameters
-          );
+          .reduce((audioParam, propertyName) => audioParam[propertyName], this.parameters);
 
         const value = audioParam.value;
 
@@ -113,14 +103,8 @@ class PinkTromboneElement extends HTMLElement {
 
           switch (event.detail.type) {
             case "linear":
-              constriction.index.linearRampToValueAtTime(
-                indexValue,
-                event.detail.endTime
-              );
-              constriction.diameter.linearRampToValueAtTime(
-                diameterValue,
-                event.detail.endTime
-              );
+              constriction.index.linearRampToValueAtTime(indexValue, event.detail.endTime);
+              constriction.diameter.linearRampToValueAtTime(diameterValue, event.detail.endTime);
               break;
             default:
               constriction.index.value = indexValue;

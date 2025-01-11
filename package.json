@@ -1,17 +1,16 @@
 {
-    "name": "pink-trombone",
-    "version": "1.0.0",
-    "type": "module",
-    "description": "A refactoring of Pink Trombone",
-    "main": "index.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "rollup -c rollup.config.js"
-    },
-    "author": "",
-    "license": "ISC",
-    "devDependencies": {},
-    "dependencies": {
-        "rollup": "^4.9.1"
-    }
+  "name": "pink-trombone",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "A refactoring of Pink Trombone",
+  "main": "index.js",
+  "scripts": {
+    "build": "rollup -c rollup.config.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {},
+  "dependencies": {
+    "rollup": "^4.9.1"
+  }
 }

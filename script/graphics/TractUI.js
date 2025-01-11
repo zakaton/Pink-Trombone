@@ -116,33 +116,24 @@ class TractUI {
     // Touch EventListeners
     this._canvases.tract.addEventListener("touchstart", (event) => {
       event.preventDefault();
-      Array.from(event.changedTouches).forEach((touch) =>
-        this._startEvent(touch)
-      );
+      Array.from(event.changedTouches).forEach((touch) => this._startEvent(touch));
     });
     this._canvases.tract.addEventListener("touchmove", (event) => {
       event.preventDefault();
-      Array.from(event.changedTouches).forEach((touch) =>
-        this._moveEvent(touch)
-      );
+      Array.from(event.changedTouches).forEach((touch) => this._moveEvent(touch));
     });
     this._canvases.tract.addEventListener("touchend", (event) => {
       event.preventDefault();
-      Array.from(event.changedTouches).forEach((touch) =>
-        this._endEvent(touch)
-      );
+      Array.from(event.changedTouches).forEach((touch) => this._endEvent(touch));
     });
     this._canvases.tract.addEventListener("touchcancel", (event) => {
       event.preventDefault();
-      Array.from(event.changedTouches).forEach((touch) =>
-        this._endEvent(touch)
-      );
+      Array.from(event.changedTouches).forEach((touch) => this._endEvent(touch));
     });
 
     // Constriction EventLiteners
     this._canvases.tract.addEventListener("didNewConstriction", (event) => {
-      this._touchConstrictionIndices[event.detail.touchIdentifier] =
-        event.detail.constrictionIndex;
+      this._touchConstrictionIndices[event.detail.touchIdentifier] = event.detail.constrictionIndex;
     });
     this._canvases.tract.addEventListener("didRemoveConstriction", (event) => {
       this._touchConstrictionIndices[event.detail.touchIdentifier] = undefined;
@@ -161,8 +152,7 @@ class TractUI {
   }
 
   _resize() {
-    this._tract.scalar =
-      this._canvases.tract.width / this._canvases.tract.offsetWidth;
+    this._tract.scalar = this._canvases.tract.width / this._canvases.tract.offsetWidth;
     this._resizeCanvases();
   }
 
@@ -193,8 +183,7 @@ class TractUI {
     for (let index = 1; index < this._processor.tract.length; index++)
       this._lineTo(index, this._processor.tract.diameter[index]);
 
-    for (let index = this._processor.tract.length - 1; index >= 2; index--)
-      this._lineTo(index, 0);
+    for (let index = this._processor.tract.length - 1; index >= 2; index--) this._lineTo(index, 0);
 
     this._context.closePath();
     this._context.stroke();
@@ -207,23 +196,16 @@ class TractUI {
     this._context.beginPath();
     this._context.lineWidth = 2;
     this._context.strokeStyle = this._context.fillStyle = "pink";
-    this._moveTo(
-      this._processor.tract.nose.start,
-      -this._processor.tract.nose.offset
-    );
+    this._moveTo(this._processor.tract.nose.start, -this._processor.tract.nose.offset);
 
     for (let index = 1; index < this._processor.tract.nose.length; index++)
       this._lineTo(
         index + this._processor.tract.nose.start,
-        -this._processor.tract.nose.offset -
-          this._processor.tract.nose.diameter[index] * 0.9
+        -this._processor.tract.nose.offset - this._processor.tract.nose.diameter[index] * 0.9
       );
 
     for (let index = this._processor.tract.nose.length - 1; index >= 1; index--)
-      this._lineTo(
-        index + this._processor.tract.nose.start,
-        -this._processor.tract.nose.offset
-      );
+      this._lineTo(index + this._processor.tract.nose.start, -this._processor.tract.nose.offset);
 
     this._context.closePath();
     this._context.fill();
@@ -232,14 +214,8 @@ class TractUI {
     this._context.lineWidth = 2;
     this._context.strokeStyle = this._context.fillStyle = "pink";
     this._moveTo(this._processor.tract.nose.start - 2, 0);
-    this._lineTo(
-      this._processor.tract.nose.start,
-      -this._processor.tract.nose.offset
-    );
-    this._lineTo(
-      this._processor.tract.nose.start + velumAngle,
-      -this._processor.tract.nose.offset
-    );
+    this._lineTo(this._processor.tract.nose.start, -this._processor.tract.nose.offset);
+    this._lineTo(this._processor.tract.nose.start + velumAngle, -this._processor.tract.nose.offset);
     this._lineTo(this._processor.tract.nose.start + velumAngle - 2, 0);
     this._context.closePath();
     this._context.stroke();
@@ -250,43 +226,13 @@ class TractUI {
     this._context.textAlign = "center";
     this._context.globalAlpha = 1;
 
-    this._drawText(
-      this._processor.tract.length * 0.1,
-      0.425,
-      "throat",
-      false,
-      false
-    );
-    this._drawText(
-      this._processor.tract.length * 0.71,
-      -1.8,
-      "nasal",
-      false,
-      false
-    );
-    this._drawText(
-      this._processor.tract.length * 0.71,
-      -1.3,
-      "cavity",
-      false,
-      false
-    );
+    this._drawText(this._processor.tract.length * 0.1, 0.425, "throat", false, false);
+    this._drawText(this._processor.tract.length * 0.71, -1.8, "nasal", false, false);
+    this._drawText(this._processor.tract.length * 0.71, -1.3, "cavity", false, false);
 
     this._context.font = "22px Arial";
-    this._drawText(
-      this._processor.tract.length * 0.6,
-      0.9,
-      "oral",
-      false,
-      false
-    );
-    this._drawText(
-      this._processor.tract.length * 0.7,
-      0.9,
-      "cavity",
-      false,
-      false
-    );
+    this._drawText(this._processor.tract.length * 0.6, 0.9, "oral", false, false);
+    this._drawText(this._processor.tract.length * 0.7, 0.9, "cavity", false, false);
 
     this._drawAmplitudes();
 
@@ -299,8 +245,7 @@ class TractUI {
       this._lineTo(index, this._processor.tract.diameter[index]);
 
     this._moveTo(1, 0);
-    for (let index = 2; index <= this._processor.tract.nose.start - 2; index++)
-      this._lineTo(index, 0);
+    for (let index = 2; index <= this._processor.tract.nose.start - 2; index++) this._lineTo(index, 0);
 
     this._moveTo(this._processor.tract.nose.start + velumAngle - 2, 0);
     for (
@@ -317,44 +262,24 @@ class TractUI {
     this._context.strokeStyle = "#C070C6";
     this._context.lineJoin = "round";
 
-    this._moveTo(
-      this._processor.tract.nose.start,
-      -this._processor.tract.nose.offset
-    );
+    this._moveTo(this._processor.tract.nose.start, -this._processor.tract.nose.offset);
     for (let index = 1; index < this._processor.tract.nose.length; index++)
       this._lineTo(
         index + this._processor.tract.nose.start,
-        -this._processor.tract.nose.offset -
-          this._processor.tract.nose.diameter[index] * 0.9
+        -this._processor.tract.nose.offset - this._processor.tract.nose.diameter[index] * 0.9
       );
 
-    this._moveTo(
-      this._processor.tract.nose.start + velumAngle,
-      -this._processor.tract.nose.offset
-    );
-    for (
-      let index = Math.ceil(velumAngle);
-      index < this._processor.tract.nose.length;
-      index++
-    )
-      this._lineTo(
-        index + this._processor.tract.nose.start,
-        -this._processor.tract.nose.offset
-      );
+    this._moveTo(this._processor.tract.nose.start + velumAngle, -this._processor.tract.nose.offset);
+    for (let index = Math.ceil(velumAngle); index < this._processor.tract.nose.length; index++)
+      this._lineTo(index + this._processor.tract.nose.start, -this._processor.tract.nose.offset);
 
     this._context.stroke();
 
     this._context.globalAlpha = velum * 5;
     this._context.beginPath();
     this._moveTo(this._processor.tract.nose.start - 2, 0);
-    this._lineTo(
-      this._processor.tract.nose.start,
-      -this._processor.tract.nose.offset
-    );
-    this._lineTo(
-      this._processor.tract.nose.start + velumAngle,
-      -this._processor.tract.nose.offset
-    );
+    this._lineTo(this._processor.tract.nose.start, -this._processor.tract.nose.offset);
+    this._lineTo(this._processor.tract.nose.start + velumAngle, -this._processor.tract.nose.offset);
     this._lineTo(this._processor.tract.nose.start + velumAngle - 2, 0);
     this._context.stroke();
 
@@ -364,8 +289,7 @@ class TractUI {
     this._context.globalAlpha = 0.7;
     this._drawText(
       this._processor.tract.length * 0.95,
-      0.8 +
-        0.8 * this._processor.tract.diameter[this._processor.tract.length - 1],
+      0.8 + 0.8 * this._processor.tract.diameter[this._processor.tract.length - 1],
       " lip",
       false,
       false
@@ -385,13 +309,7 @@ class TractUI {
     const radius = this._getRadius(index, diameter);
 
     this._context.beginPath();
-    this._context.arc(
-      this._getX(angle, radius),
-      this._getY(angle, radius),
-      arcRadius,
-      0,
-      2 * Math.PI
-    );
+    this._context.arc(this._getX(angle, radius), this._getY(angle, radius), arcRadius, 0, 2 * Math.PI);
     this._context.fill();
   }
   _drawTongueControl() {
@@ -401,10 +319,7 @@ class TractUI {
     this._context.beginPath();
     this._context.lineWidth = 45;
 
-    this._moveTo(
-      this._processor.tract.tongue.range.index.minValue,
-      this._processor.tract.tongue.diameter.minValue
-    ); // diameter/2?
+    this._moveTo(this._processor.tract.tongue.range.index.minValue, this._processor.tract.tongue.diameter.minValue); // diameter/2?
     for (
       let index = this._processor.tract.tongue.range.index.minValue + 1;
       index <= this._processor.tract.tongue.range.maxValue;
@@ -412,10 +327,7 @@ class TractUI {
     ) {
       this._lineTo(index, this._processor.tract.tongue.range.diameter.minValue);
     }
-    this._lineTo(
-      this._processor.tract.tongue.range.index.center,
-      this._processor.tract.tongue.range.diameter.maxValue
-    );
+    this._lineTo(this._processor.tract.tongue.range.index.center, this._processor.tract.tongue.range.diameter.maxValue);
     this._context.closePath();
     this._context.stroke();
     this._context.fill();
@@ -423,42 +335,27 @@ class TractUI {
     this._context.fillStyle = "orchid";
     this._context.globalAlpha = 0.3;
 
-    [0, -4.25, -8.5, 4.25, 8.5, -6.1, 6.1, 0, 0].forEach(
-      (indexOffset, _index) => {
-        const diameter =
-          _index < 5
-            ? this._processor.tract.tongue.range.diameter.minValue
-            : _index < 8
-            ? this._processor.tract.tongue.range.diameter.center
-            : this._processor.tract.tongue.range.diameter.maxValue;
+    [0, -4.25, -8.5, 4.25, 8.5, -6.1, 6.1, 0, 0].forEach((indexOffset, _index) => {
+      const diameter =
+        _index < 5
+          ? this._processor.tract.tongue.range.diameter.minValue
+          : _index < 8
+          ? this._processor.tract.tongue.range.diameter.center
+          : this._processor.tract.tongue.range.diameter.maxValue;
 
-        indexOffset *= this._processor.tract.length / 44;
+      indexOffset *= this._processor.tract.length / 44;
 
-        this._drawCircle(
-          this._processor.tract.tongue.range.index.center + indexOffset,
-          diameter,
-          3
-        );
-      }
-    );
+      this._drawCircle(this._processor.tract.tongue.range.index.center + indexOffset, diameter, 3);
+    });
 
     const tongueAngle = this._getAngle(this._processor.tract.tongue.index);
-    const tongueRadius = this._getRadius(
-      this._processor.tract.tongue.index,
-      this._processor.tract.tongue.diameter
-    );
+    const tongueRadius = this._getRadius(this._processor.tract.tongue.index, this._processor.tract.tongue.diameter);
 
     this._context.lineWidth = 4;
     this._context.strokeStyle = "orchid";
     this._context.globalAlpha = 0.7;
     this._context.beginPath();
-    this._context.arc(
-      this._getX(tongueAngle, tongueRadius),
-      this._getY(tongueAngle, tongueRadius),
-      18,
-      0,
-      2 * Math.PI
-    );
+    this._context.arc(this._getX(tongueAngle, tongueRadius), this._getY(tongueAngle, tongueRadius), 18, 0, 2 * Math.PI);
     this._context.stroke();
     this._context.globalAlpha = 0.15;
     this._context.fill();
@@ -472,8 +369,7 @@ class TractUI {
 
     for (let index = 2; index < this._processor.tract.length - 1; index++) {
       this._context.beginPath();
-      this._context.lineWidth =
-        Math.sqrt(this._processor.tract.amplitude.max[index]) * 3;
+      this._context.lineWidth = Math.sqrt(this._processor.tract.amplitude.max[index]) * 3;
 
       this._moveTo(index, 0);
       this._lineTo(index, this._processor.tract.diameter[index]);
@@ -481,23 +377,14 @@ class TractUI {
       this._context.stroke();
     }
 
-    for (
-      let index = 1;
-      index < this._processor.tract.nose.length - 1;
-      index++
-    ) {
+    for (let index = 1; index < this._processor.tract.nose.length - 1; index++) {
       this._context.beginPath();
-      this._context.lineWidth =
-        Math.sqrt(this._processor.tract.nose.amplitude.max[index]) * 3;
+      this._context.lineWidth = Math.sqrt(this._processor.tract.nose.amplitude.max[index]) * 3;
 
-      this._moveTo(
-        this._processor.tract.nose.start + index,
-        -this._processor.tract.nose.offset
-      );
+      this._moveTo(this._processor.tract.nose.start + index, -this._processor.tract.nose.offset);
       this._lineTo(
         this._processor.tract.nose.start + index,
-        -this._processor.tract.nose.offset -
-          this._processor.tract.nose.diameter[index] * 0.9
+        -this._processor.tract.nose.offset - this._processor.tract.nose.diameter[index] * 0.9
       );
 
       this._context.stroke();
@@ -538,10 +425,7 @@ class TractUI {
     this._drawText(4.5, 0.37, "h", false);
 
     // setting up phoneme stuff
-    const phonemes =
-      this._parameters.intensity > 0
-        ? ["ʒ", "z", "v", "g", "d", "b"]
-        : ["ʃ", "s", "f", "k", "t", "p"];
+    const phonemes = this._parameters.intensity > 0 ? ["ʒ", "z", "v", "g", "d", "b"] : ["ʃ", "s", "f", "k", "t", "p"];
     phonemes.push("ŋ", "n", "m");
 
     const fricatives = 0.3;
@@ -562,10 +446,7 @@ class TractUI {
     const radius = this._getRadius(index, diameter);
 
     this._context.save();
-    this._context.translate(
-      this._getX(angle, radius),
-      this._getY(angle, radius) + 2
-    );
+    this._context.translate(this._getX(angle, radius), this._getY(angle, radius) + 2);
 
     if (!isStraight) this._context.rotate(angle - Math.PI / 2);
 
@@ -599,20 +480,14 @@ class TractUI {
 
   _getAngle(index) {
     const angle =
-      this._tract.angle.offset +
-      (index * this._tract.angle.scale * Math.PI) /
-        (this._processor.tract.lip.start - 1);
+      this._tract.angle.offset + (index * this._tract.angle.scale * Math.PI) / (this._processor.tract.lip.start - 1);
     return angle;
   }
   _getWobble(index) {
     var wobble =
       this._processor.tract.amplitude.max[this._processor.tract.length - 1] +
-      this._processor.tract.nose.amplitude.max[
-        this._processor.tract.nose.length - 1
-      ];
-    wobble *=
-      (0.03 * Math.sin(2 * index - 50 * (Date.now() / 1000)) * index) /
-      this._processor.tract.length;
+      this._processor.tract.nose.amplitude.max[this._processor.tract.nose.length - 1];
+    wobble *= (0.03 * Math.sin(2 * index - 50 * (Date.now() / 1000)) * index) / this._processor.tract.length;
     return wobble;
   }
   _getRadius(index, diameter) {
@@ -626,15 +501,12 @@ class TractUI {
     while (angle > 0) angle -= 2 * Math.PI;
 
     const index =
-      ((Math.PI + angle - this._tract.angle.offset) *
-        (this._processor.tract.lip.start - 1)) /
+      ((Math.PI + angle - this._tract.angle.offset) * (this._processor.tract.lip.start - 1)) /
       (this._tract.angle.scale * Math.PI);
     return index;
   }
   _getDiameter(x, y) {
-    const diameter =
-      (this._tract.radius - Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2))) /
-      this._tract.scale;
+    const diameter = (this._tract.radius - Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2))) / this._tract.scale;
     return diameter;
   }
 
@@ -652,15 +524,11 @@ class TractUI {
   }
 
   _getEventX(event) {
-    const x =
-      (event.pageX - event.target.offsetLeft) * this._tract.scalar -
-      this._tract.origin.x;
+    const x = (event.pageX - event.target.offsetLeft) * this._tract.scalar - this._tract.origin.x;
     return x;
   }
   _getEventY(event) {
-    const y =
-      (event.pageY - event.target.offsetTop) * this._tract.scalar -
-      this._tract.origin.y;
+    const y = (event.pageY - event.target.offsetTop) * this._tract.scalar - this._tract.origin.y;
     return y;
   }
 
@@ -692,10 +560,7 @@ class TractUI {
     const touchIdentifier = event instanceof Touch ? event.identifier : -1;
     if (this._touchConstrictionIndices[touchIdentifier] == undefined) {
       const position = this._getEventPosition(event);
-      const isNearTongue = this._isNearTongue(
-        position.index,
-        position.diameter
-      );
+      const isNearTongue = this._isNearTongue(position.index, position.diameter);
       if (isNearTongue) {
         this._touchConstrictionIndices[touchIdentifier] = -1;
         this._setTongue(event, position);
