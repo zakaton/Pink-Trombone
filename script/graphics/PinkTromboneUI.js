@@ -16,16 +16,15 @@ class PinkTromboneUI {
     this._container = document.createElement("div");
 
     Object.assign(this._container.style, {
+      position: "relative",
       width: "100%",
       height: "100%",
       minWidth: "0",
       minHeight: "0",
-
       display: "grid",
       gridTemplateRows: "minmax(0, 1fr) 100px",
       gridTemplateColumns: "minmax(0, 1fr)",
       gap: "5px",
-
       overflow: "hidden",
     });
 
@@ -63,7 +62,6 @@ class PinkTromboneUI {
       zIndex: "2",
       top: "5px",
       right: "5px",
-      width: "90px",
     });
 
     this._buttonsUI.node.id = "buttonsUI";
