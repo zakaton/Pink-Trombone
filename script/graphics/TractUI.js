@@ -24,6 +24,9 @@ class TractUI {
       canvas.style.margin = 0;
       canvas.style.padding = 0;
       canvas.style.zIndex = 1 - index;
+      canvas.style.objectFit = "contain";
+      canvas.style.width = "100%";
+      canvas.style.height = "100%";
 
       this._canvases[id] = canvas;
       this._contexts[id] = canvas.getContext("2d");
@@ -74,12 +77,12 @@ class TractUI {
     });
 
     window.addEventListener("resize", () => {
-      this._resize();
+      // this._resize();
     });
     this._container.addEventListener(
       "didGetProcessor",
       (event) => {
-        this._resize();
+        // this._resize();
       },
       { once: true },
     );
@@ -178,7 +181,7 @@ class TractUI {
 
   _resizeCanvases() {
     for (let id in this._canvases) {
-      //this._canvases[id].style.width = this._container.offsetWidth;
+      this._canvases[id].style.width = this._container.offsetWidth;
       this._canvases[id].style.height = this._container.offsetHeight;
     }
   }
@@ -661,22 +664,33 @@ class TractUI {
     return isTongue;
   }
 
-  _getEventX(event) {
-    const x =
-      (event.pageX - event.target.offsetLeft) * this._tract.scalar -
-      this._tract.origin.x;
-    return x;
-  }
-  _getEventY(event) {
-    const y =
-      (event.pageY - event.target.offsetTop) * this._tract.scalar -
-      this._tract.origin.y;
-    return y;
+  _getRelativePosition(event, canvas) {
+    const rect = canvas.getBoundingClientRect();
+
+    const scale = Math.min(
+      rect.width / canvas.width,
+      rect.height / canvas.height,
+    );
+
+    const renderedWidth = canvas.width * scale;
+    const renderedHeight = canvas.height * scale;
+
+    // Centered object-fit: contain offsets
+    const offsetX = (rect.width - renderedWidth) / 2;
+    const offsetY = (rect.height - renderedHeight) / 2;
+
+    const x = (event.clientX - rect.left - offsetX) / renderedWidth;
+    const y = (event.clientY - rect.top - offsetY) / renderedHeight;
+
+    return {
+      x: x * event.target.width - this._tract.origin.x,
+      y: y * event.target.height - this._tract.origin.y,
+      inside: x >= 0 && x <= 1 && y >= 0 && y <= 1,
+    };
   }
 
   _getEventPosition(event) {
-    const x = this._getEventX(event);
-    const y = this._getEventY(event);
+    let { x, y, inside } = this._getRelativePosition(event, event.target);
 
     return {
       index: this._getIndex(x, y),
