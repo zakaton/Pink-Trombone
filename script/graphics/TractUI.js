@@ -73,9 +73,6 @@ class TractUI {
       );
     });
 
-    window.addEventListener("resize", () => {
-      this._resize();
-    });
     this._container.addEventListener(
       "didGetProcessor",
       (event) => {
