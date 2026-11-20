@@ -16,11 +16,19 @@ class ButtonsUI {
       start: this._createButton("start"),
     };
 
+    const intervalId = setInterval(() => {
+      this._buttons.start.dispatchEvent(
+        new CustomEvent("queryResume", {
+          bubbles: true,
+        }),
+      );
+    }, 500);
     this._buttons.start.addEventListener("didResume", (event) => {
       event.target.parentElement.removeChild(event.target);
+      clearInterval(intervalId);
     });
     this._buttons.start.addEventListener("click", (event) => {
-      event.target.dispatchEvent(
+      this._buttons.start.dispatchEvent(
         new CustomEvent("resume", {
           bubbles: true,
         }),

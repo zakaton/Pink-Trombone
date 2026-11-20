@@ -17,7 +17,8 @@ class PinkTromboneElement extends HTMLElement {
     window.customElements.whenDefined("pink-trombone").then(() => {
       // RequestAnimationFrame
       this.addEventListener("requestAnimationFrame", (event) => {
-        if (!this._animationFrameObservers.includes(event.target)) this._animationFrameObservers.push(event.target);
+        if (!this._animationFrameObservers.includes(event.target))
+          this._animationFrameObservers.push(event.target);
 
         const customEvent = new CustomEvent("didRequestAnimationFrame");
         event.target.dispatchEvent(customEvent);
@@ -30,18 +31,29 @@ class PinkTromboneElement extends HTMLElement {
         this.pinkTrombone.start();
         event.target.dispatchEvent(new CustomEvent("didResume"));
       });
+      this.addEventListener("queryResume", (event) => {
+        if (this.audioContext.state == "running") {
+          event.target.dispatchEvent(new CustomEvent("didResume"));
+        }
+      });
 
       // Audio Parameters
       this.addEventListener("setParameter", (event) => {
         const parameterName = event.detail.parameterName;
         const audioParam = parameterName
           .split(".")
-          .reduce((audioParam, propertyName) => audioParam[propertyName], this.parameters);
+          .reduce(
+            (audioParam, propertyName) => audioParam[propertyName],
+            this.parameters,
+          );
         const newValue = Number(event.detail.newValue);
 
         switch (event.detail.type) {
           case "linear":
-            audioParam.linearRampToValueAtTime(newValue, this.audioContext.currentTime + event.detail.timeOffset);
+            audioParam.linearRampToValueAtTime(
+              newValue,
+              this.audioContext.currentTime + event.detail.timeOffset,
+            );
             break;
           default:
             audioParam.value = newValue;
@@ -50,7 +62,7 @@ class PinkTromboneElement extends HTMLElement {
         event.target.dispatchEvent(
           new CustomEvent("didSetParameter", {
             detail: event.detail,
-          })
+          }),
         );
 
         event.stopPropagation();
@@ -60,7 +72,10 @@ class PinkTromboneElement extends HTMLElement {
         const parameterName = event.detail.parameterName;
         const audioParam = parameterName
           .split(".")
-          .reduce((audioParam, propertyName) => audioParam[propertyName], this.parameters);
+          .reduce(
+            (audioParam, propertyName) => audioParam[propertyName],
+            this.parameters,
+          );
 
         const value = audioParam.value;
 
@@ -70,7 +85,7 @@ class PinkTromboneElement extends HTMLElement {
         event.target.dispatchEvent(
           new CustomEvent("didGetParameter", {
             detail: detail,
-          })
+          }),
         );
 
         event.stopPropagation();
@@ -86,7 +101,7 @@ class PinkTromboneElement extends HTMLElement {
         event.target.dispatchEvent(
           new CustomEvent("didNewConstriction", {
             detail: detail,
-          })
+          }),
         );
 
         event.stopPropagation();
@@ -103,8 +118,14 @@ class PinkTromboneElement extends HTMLElement {
 
           switch (event.detail.type) {
             case "linear":
-              constriction.index.linearRampToValueAtTime(indexValue, event.detail.endTime);
-              constriction.diameter.linearRampToValueAtTime(diameterValue, event.detail.endTime);
+              constriction.index.linearRampToValueAtTime(
+                indexValue,
+                event.detail.endTime,
+              );
+              constriction.diameter.linearRampToValueAtTime(
+                diameterValue,
+                event.detail.endTime,
+              );
               break;
             default:
               constriction.index.value = indexValue;
@@ -126,7 +147,7 @@ class PinkTromboneElement extends HTMLElement {
               index: constriction.index.value,
               diameter: constriction.diameter.value,
             },
-          })
+          }),
         );
 
         event.stopPropagation();
@@ -141,7 +162,7 @@ class PinkTromboneElement extends HTMLElement {
         event.target.dispatchEvent(
           new CustomEvent("didRemoveConstriction", {
             detail: detail,
-          })
+          }),
         );
 
         event.stopPropagation();
@@ -154,7 +175,7 @@ class PinkTromboneElement extends HTMLElement {
               detail: {
                 processor: processor,
               },
-            })
+            }),
           );
         });
 
@@ -220,7 +241,7 @@ class PinkTromboneElement extends HTMLElement {
       for (let parameterName in this.pinkTrombone.parameters)
         this[parameterName] = this.pinkTrombone.parameters[parameterName];
 
-      return this.pinkTrombone;
+      if (audioContext.st) return this.pinkTrombone;
     });
     return this.loadPromise;
   }
@@ -264,7 +285,7 @@ class PinkTromboneElement extends HTMLElement {
         element.dispatchEvent(customEvent);
       });
       window.requestAnimationFrame((_highResTimeStamp) =>
-        this._requestAnimationFrameCallback.call(this, _highResTimeStamp)
+        this._requestAnimationFrameCallback.call(this, _highResTimeStamp),
       );
     }
   }
